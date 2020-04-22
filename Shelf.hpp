@@ -2,7 +2,7 @@
 #define SHELF_HPP
 
 #include <list>
-#include "ink.hpp"
+#include "Ink.hpp"
 #include <cstdlib>
 #include <ctime>
 

@@ -278,10 +278,8 @@ ostream & operator<< ( ostream &out, Shelf &shelf)
 {
     if(!shelf.empty())
     {
-        cout << shelf.length() << endl;
         for(list<Ink>::iterator i = shelf.begin(); i != shelf.end(); i++)
-            if((*i) != NULL)
-                out << (*i);
+            out << (*i);
         out << endl;
     }
     return out;

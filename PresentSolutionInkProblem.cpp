@@ -32,28 +32,29 @@ PresentSolutionInkProblem::PresentSolutionInkProblem(string fileName)
 
     file.open( fileName, std::ios::in);
 
-    getline(file,line);
-    solutionsSize = atoi(line.c_str());
-
-    getline(file,line);
-
-    for(int i = 0; i < solutionsSize; i++)
+    while(getline(file,line))
     {
-        SolutionInkProblem *new_game = new SolutionInkProblem("1");
-        solutions.push_back(new_game);
+        SolutionInkProblem *newSolution = new SolutionInkProblem(line);
+        solutions.push_back(newSolution);
     }
-
-    for(list<SolutionInkProblem*>::iterator g = solutions.begin(); g != solutions.end(); g++)
-        (*g)->LoadFromFile(&file);
 
     file.close();
 }
 
 SolutionInkProblem* PresentSolutionInkProblem::AddSolution(string shelf)
 {
-    SolutionInkProblem *new_game = new SolutionInkProblem(shelf);
-    solutions.push_back(new_game);
-    return new_game;
+    SolutionInkProblem *newSolution = new SolutionInkProblem(shelf);
+    solutions.push_back(newSolution);
+    return newSolution;
+}
+
+bool PresentSolutionInkProblem::Check()
+{
+    for(list<SolutionInkProblem*>::iterator i = solutions.begin(); i != solutions.end(); i++)
+        if((*i)->Check() == false)
+            return false;
+
+    return true;
 }
 
 SolutionInkProblem* PresentSolutionInkProblem::FindGame(string shelf)
@@ -81,14 +82,8 @@ void PresentSolutionInkProblem::Loadsolutions(string f)
 
 void PresentSolutionInkProblem::Print()
 {
-    int j = 1;
     for(list<SolutionInkProblem*>::iterator i = solutions.begin(); i != solutions.end(); i++)
-    {
-        cout << j << endl;
         (*i)->Print();
-        cout << endl;
-        j++;
-    }
 }
 
 void PresentSolutionInkProblem::PrintShelf()

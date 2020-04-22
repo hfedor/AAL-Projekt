@@ -1,7 +1,8 @@
 #include "Tests.hpp"
-#include "ink.hpp"
-#include "shelf.hpp"
-#include "solutioninkproblem.hpp"
+#include "Ink.hpp"
+#include "Shelf.hpp"
+#include "SolutionInkProblem.hpp"
+#include "PresentSolutionInkProblem.hpp"
 
 using namespace std;
 
@@ -12,6 +13,8 @@ bool Tests::testAll()
     if(!ShelfTest())
         return false;
     if(!SolutionInkProblemTest())
+        return false;
+    if(!PresentSolutionInkProblemTest())
         return false;
 
     cout << "All OK." << endl;
@@ -182,7 +185,7 @@ bool Tests::SolutionInkProblemTest()
 
         if(sip1.GetDistance() != 0)
             throw PreperExceptionData("SolutionInkProblem","SolutionInkProblem(int)","Object wa not constructed properly!");
-        if(!sip1.GetTransfers().empty())
+        if(!sip1.GetTransfersByString().empty())
             throw PreperExceptionData("SolutionInkProblem","SolutionInkProblem(int)","Object wa not constructed properly!");
         if(sip1.GetStart() != 2)
             throw PreperExceptionData("SolutionInkProblem","SolutionInkProblem(int)","Object wa not constructed properly!");
@@ -193,7 +196,7 @@ bool Tests::SolutionInkProblemTest()
 
         if(sip3.GetDistance() != 0)
             throw PreperExceptionData("SolutionInkProblem","SolutionInkProblem(std::string)","Object wa not constructed properly!");
-        if(!sip3.GetTransfers().empty())
+        if(!sip3.GetTransfersByString().empty())
             throw PreperExceptionData("SolutionInkProblem","SolutionInkProblem(std::string)","Object wa not constructed properly!");
         if(sip3.GetStart() != 2)
             throw PreperExceptionData("SolutionInkProblem","SolutionInkProblem(std::string)","Object wa not constructed properly!");
@@ -223,20 +226,17 @@ bool Tests::SolutionInkProblemTest()
         SIPTMove(&sip4,"10","KYMKCCYM",164,"012301230110");
         SIPTMove(&sip4,"102","YMYMKCKC",206,"012301230110102");
 
-        SIPTMoveBottleToPos(&sip2,1,2);
-        SIPTMoveBottleToPos(&sip2,1,1);
-        SIPTMoveBottleToPos(&sip2,1,9);
-        SIPTMoveBottleToPos(&sip2,9,1);
-        SIPTMoveBottleToPos(&sip2,-1,9);
-        SIPTMoveBottleToPos(&sip2,1,-1);
-        SIPTMoveBottleToPos(&sip2,4,1);
-        SIPTMoveBottleToPos(&sip2,2,1);
+        SIPTMoveBottleToPos(&sip2);
 
-        if(!(sip4.ScaleTransfersFrom6("01234") == "23456"))
-            throw PreperExceptionData("SolutionInkProblem","ScaleTransfersFrom6","Transfer was not scaled properly!");
+        //if(!(sip4.ScaleTransfersFrom6("012345") == "234567"))
+            //throw PreperExceptionData("SolutionInkProblem","ScaleTransfersFrom6","Transfer was not scaled properly!");
+        //if(!(sip4.ScaleTransfersFrom6("01234") == "23456"))
+            //throw PreperExceptionData("SolutionInkProblem","ScaleTransfersFrom6","Transfer was not scaled properly!");
 
         sip2 = sip4;
-        sip4.Solve(true);
+        if(!sip4.Solve(false))
+	    throw PreperExceptionData("SolutionInkProblem","Solve","Can not solve!");
+
         if(!(sip4.ToString() == sip2.GetShelf().Sort()))
         {
             string className = "SolutionInkProblem";
@@ -261,9 +261,13 @@ bool Tests::SolutionInkProblemTest()
 void Tests::SIPTMove(SolutionInkProblem* sip,string transfers,string shelfResult,int distanceResult,string transfersResult)
 {
     string className = "SolutionInkProblem";
-    string functionName = "Move4InksBottles";
+    string functionName = "Move";
+    list<int> transfersList;
 
-    sip->Move(transfers,false);
+    for(int i = 0; i < transfers.length(); i++)
+        transfersList.push_back(transfers[i] - 48);
+
+    sip->Move(transfersList,false);
     if(!(sip->GetShelf() == shelfResult))
     {
         string message = "Bottles were transported not properly!\nresult:\t\t";
@@ -288,10 +292,10 @@ void Tests::SIPTMove(SolutionInkProblem* sip,string transfers,string shelfResult
         message += to_string(distanceResult);
         throw PreperExceptionData(className,functionName,message);
     }
-    if(!(sip->GetTransfers() == transfersResult))
+    if(!(sip->GetTransfersByString() == transfersResult))
     {
         string message = "Not correct Transfers!!\nresult:\t\t";
-        message += sip->GetTransfers();
+        message += sip->GetTransfersByString();
         message +=  "\nexpected:\t";
         message += transfersResult;
         throw PreperExceptionData(className,functionName,message);
@@ -328,10 +332,10 @@ void Tests::SIPTMove4InksBottles(SolutionInkProblem* sip,int transfer,string she
         message += to_string(distanceResult);
         throw PreperExceptionData(className,functionName,message);
     }
-    if(!(sip->GetTransfers() == transfersResult))
+    if(!(sip->GetTransfersByString() == transfersResult))
     {
         string message = "Not correct Transfers!!\nresult:\t\t";
-        message += sip->GetTransfers();
+        message += sip->GetTransfersByString();
         message +=  "\nexpected:\t";
         message += transfersResult;
         throw PreperExceptionData(className,functionName,message);
@@ -357,19 +361,46 @@ void Tests::SIPTMoveBottleToPos(SolutionInkProblem* sip,int actPos,int bottleToB
     if(sip->MoveBottleToPos(actPos,bottleToBeMoved,false) == -1)
         return;
 
-    if(!(sip->ToString()[actPos] == inkToBeMoved))
+    for(int i = 0; i <= actPos; i++)
+        if(!(sip->ToString()[i] == result[i]))
+        {
+            string message = "Bottles were transported not properly!\nactual position:\t";
+            message += to_string(actPos);
+            message +=  "\tbottle to be moved:\t";
+            message += to_string(bottleToBeMoved);
+            message +=  "\nresult:\t\t";
+            message += sip->ToString();
+            message +=  "\nexpected:\t";
+            message += result;
+            throw PreperExceptionData(className,functionName,message);
+        }
+
+}
+
+void Tests::SIPTMoveBottleToPos(SolutionInkProblem* sip)
+{
+    for(int i = -1; i <= sip->length(); i++)
+        for(int j = -1; j <= sip->length(); j++)
+            SIPTMoveBottleToPos(sip,i,j);
+}
+
+bool Tests::PresentSolutionInkProblemTest()
+{
+    try
     {
-        string message = "Bottles were transported not properly!\nactual position:\t";
-        message += to_string(actPos);
-        message +=  "\tbottle to be moved:\t";
-        message += to_string(bottleToBeMoved);
-        message +=  "\nresult:\t\t";
-        message += sip->ToString();
-        message +=  "\nexpected:\t";
-        message += result;
-        throw PreperExceptionData(className,functionName,message);
+        PresentSolutionInkProblem psip("every7.txt");
+
+        psip.Solve(false);
+
+
+    }
+    catch(exceptionData exc)
+    {
+        cout << exc << endl;
+        return false;
     }
 
+    return true;
 }
 
 ostream & operator<< (ostream &out, const exceptionData &exc)

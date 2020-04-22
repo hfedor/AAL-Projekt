@@ -14,6 +14,8 @@ class Tests
         void SIPTMove(SolutionInkProblem* sip,std::string transfers,std::string shelfResult,int distanceResult, std::string transfersResult);
         void SIPTMove4InksBottles(SolutionInkProblem* sip,int transfer,std::string shelfResult,int distanceResult, std::string transfersResult);
         void SIPTMoveBottleToPos(SolutionInkProblem* sip,int actPos,int bottleToBeMoved);
+        void SIPTMoveBottleToPos(SolutionInkProblem* sip);
+        bool PresentSolutionInkProblemTest();
 };
 
 struct exceptionData

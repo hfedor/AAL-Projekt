@@ -17,8 +17,8 @@ public:
     PresentSolutionInkProblem(int SolutionsNumb, std::string newShelf); // construct given number of solutions with given shelf
     PresentSolutionInkProblem(std::string fileNama); // load solutions from file with given name
     SolutionInkProblem* AddSolution(std::string shelf); // add solution with given shelf to the list
+    bool Check();
     std::list<SolutionInkProblem*>::iterator GetBegin(){return solutions.begin();}
-    void AnimateTransfer(int first);
     std::list<SolutionInkProblem*>::iterator GetEnd(){return solutions.end();}
     SolutionInkProblem* FindGame(std::string shelf); // find in the list solution with given shelf
     int GetSize(){return solutions.size();} // get number of solutions on the list
