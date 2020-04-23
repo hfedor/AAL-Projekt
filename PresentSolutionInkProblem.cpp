@@ -147,7 +147,7 @@ void StartProgram(int argNumb, char **arguments)
     if(argNumb == 1)
 		cout << "\tThe program sorting ink bottles.\n" <<
 			"\t\ttest\ttesting program\n" <<
-			"\t\tstring with only 'C', 'M', 'Y' and 'K' - sole given shelf (ex. solveInkProblem CCMYCK)\n" <<
+			"\t\tstring with only 'C', 'M', 'Y' and 'K' - solve given shelf (ex. solveInkProblem CCMYCK)\n" <<
 			"\t\tfile \"fileName.txt\" - solve every shelf infile with given name (ex. file = \"CYKCYM\\nYKCYK\\nKYMKNY...\")\n" <<
 			"\t\tnumb - generate randomly shelf with given length and solve it\n" <<
 			"\t\t\t anim - solve with animation\n" << endl;
