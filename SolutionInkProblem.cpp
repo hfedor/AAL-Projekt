@@ -2,13 +2,21 @@
 
 #include <iostream>
 #include <cstdlib>
-//#include <conio.h>
-#include <curses.h>
 #include <string>
-//#include <windows.h>
-#include <unistd.h>
 #include <chrono>
 #include <thread>
+
+#ifdef __WIN32__
+
+#include <windows.h>
+#include <conio.h>
+
+#else
+
+#include <curses.h>
+#include <unistd.h>
+
+#endif
 
 using namespace std;
 
@@ -35,6 +43,15 @@ SolutionInkProblem::SolutionInkProblem(string new_shelf)
 bool SolutionInkProblem::Check()
 {
     return shelf.Check();
+}
+
+void SolutionInkProblem::ClearTerminal()
+{
+#ifdef __WIN32__
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 list<Ink>::iterator SolutionInkProblem::FindByNumber(int numb)
@@ -156,7 +173,7 @@ int SolutionInkProblem::MovePointer(int newPosition, bool animated)
 
             while(armFirst != newPosition)
         {
-            system("clear");
+            ClearTerminal();
             cout << "\n";
             for(int i = 0; i < shelf.length(); i++)
             {
@@ -172,7 +189,7 @@ int SolutionInkProblem::MovePointer(int newPosition, bool animated)
             cout << "\n" << shelf << "\n";
             cout << "\ndistance:\t" << distance + newDistance << "\n";
             cout << "transfers:\t" << numberOfShifts << endl;;
-            std::this_thread::sleep_for(std::chrono::nanoseconds(300000000));
+            SleepASecond(1);
 
             if(armFirst < newPosition)
                 armFirst++;
@@ -216,31 +233,41 @@ int SolutionInkProblem::MoveBottleToPos(int actPos, int bottleToBeMoved, bool an
             Move4InksBottles(bottleToBeMoved - 4, animated);
             bottleToBeMoved -= 4;
         }
-        else if(bottleToBeMoved >= length() - 4)
-        {
-            while(distance%4 != 0)
-            {
-                Move4InksBottles(length() - 5, animated);
-                if(bottleToBeMoved < length() - 1)
-                    bottleToBeMoved++;
-                else
-                    bottleToBeMoved = length() - 5;
-                distance = bottleToBeMoved - actPos;
-            }
-        }
         else
         {
-            int i;
-            for(i = 0; i < 4; i++)
-                if((length() - 1 - i - actPos)%4 == 0)
-                    break;
+            int nextPos;
+            for(int i = length() - 4; i < length(); i++)
+                if(((i - actPos)%4) == 0)
+                    nextPos = i;
 
-            for(int j = 0; j < 3; j++)
-                if(bottleToBeMoved - 3 + i < actPos)
-                    i++;
+            int disNextToStart;
 
-            Move4InksBottles(bottleToBeMoved - 3 + i, animated);
-            bottleToBeMoved = length() - 1 - i;
+            while(distance%4 != 0)
+            {
+                if(bottleToBeMoved >= length() - 4 && nextPos <  bottleToBeMoved)
+                {
+                    Move4InksBottles(bottleToBeMoved - 4, animated);
+                    bottleToBeMoved -= 4;
+                    continue;
+                }
+
+                disNextToStart = length() - 1 - nextPos + bottleToBeMoved - 3;
+                for(int i = 0; i < 4; i++)
+                    if(disNextToStart + i >= actPos && disNextToStart + i < length())
+                    {
+                        if(i != 4)
+                        {
+                            Move4InksBottles(disNextToStart + i, animated);
+                            bottleToBeMoved = nextPos - i;
+                            break;
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                distance = bottleToBeMoved - actPos;
+            }
         }
     }
 
@@ -293,8 +320,6 @@ char SolutionInkProblem::NextToSort(char &actual)
     }
 }
 
-
-
 int SolutionInkProblem::PointerLeft()
 {
         pointer--;
@@ -315,8 +340,9 @@ void SolutionInkProblem::Print()
 {
     cout << shelf;
     cout << "distance: " << distance + (int)abs(start-pointer) << "\nnumberOfShifts: " << numberOfShifts << endl;
+    cout << "transfers:\n";
     for(list<int>::iterator i = transfers.begin(); i != transfers.end(); i++)
-        cout << length() - (*i);
+        cout << length() - (*i) << " ";
     cout << endl;
 }
 
@@ -327,7 +353,7 @@ void SolutionInkProblem::PrintForAnimation(int step)
 
     if(step <= 0)
     {
-        system("clear");
+        ClearTerminal();
         cout << "\n";
         for(int i = 0; i < shelf.length(); i++)
         {
@@ -343,7 +369,7 @@ void SolutionInkProblem::PrintForAnimation(int step)
         cout << "\n" << shelf << "\n";
         cout << "\ndistance:\t" << distance + newDistance << "\n";
         cout << "transfers:\t" << numberOfShifts << endl;;
-        std::this_thread::sleep_for(std::chrono::nanoseconds(300000000));
+        SleepASecond(3);
     }
     else if(step == 1)
     {
@@ -366,7 +392,7 @@ void SolutionInkProblem::PrintForAnimation(int step)
 
         while(armFirst <= shelf.length() - 4)
         {
-            system("clear");
+            ClearTerminal();
             for(int i = 0; i < shelf.length(); i++)
             {
                 if(i == armFirst)
@@ -392,7 +418,7 @@ void SolutionInkProblem::PrintForAnimation(int step)
             cout << "\n" << shelf << "\n";
             cout << "\ndistance:\t" << distance + newDistance << "\n";
             cout << "transfers:\t" << numberOfShifts << endl;;
-            std::this_thread::sleep_for(std::chrono::nanoseconds(300000000));
+            SleepASecond(1);
 
             armFirst++;
             if(armFirst <= shelf.length() - 4)
@@ -402,21 +428,21 @@ void SolutionInkProblem::PrintForAnimation(int step)
         for(int i = 0; i < 4; i++)
             shelf[shelf.length() - 4 + i] = inArm[i];
 
-        system("clear");
+        ClearTerminal();
         cout << "\n";
         for(int i = 0; i < shelf.length() - 4; i++)
             cout << " ";
         cout << "____\n" << shelf << "\n";
         cout << "\ndistance:\t" << distance  + newDistance << "\n";
         cout << "transfers:\t" << numberOfShifts << endl;;
-        std::this_thread::sleep_for(std::chrono::nanoseconds(300000000));
+        SleepASecond(3);
 
         while(armFirst > start + 1)
         {
             newDistance++;
             newShelf = "";
 
-            system("clear");
+            ClearTerminal();
 
             cout << "\n";
             for(int i = 0; i < shelf.length(); i++)
@@ -447,7 +473,7 @@ void SolutionInkProblem::PrintForAnimation(int step)
             cout << "\n" << shelf << "\n";
             cout << "\ndistance:\t" << distance  + newDistance << "\n";
             cout << "transfers:\t" << numberOfShifts << endl;;
-            std::this_thread::sleep_for(std::chrono::nanoseconds(300000000));
+            SleepASecond(1);
 
             if(armFirst > start + 1)
                 armFirst--;
@@ -468,6 +494,29 @@ void SolutionInkProblem::PrintForPlay()
     cout << "\ndistance: " << distance + (int)abs(start-pointer) << "\nnumberOfShifts: " << numberOfShifts << endl;
 }
 
+list<int> SolutionInkProblem::ScaleTransfersFrom6(string transfersFor6)
+{
+    list<int> transfersForLonger;
+    int transfer;
+
+    for(int i = 0; i < transfersFor6.length(); i++)
+    {
+        transfer = (int)transfersFor6[i] - (int)48;
+        transfersForLonger.push_back(transfer + length() - 6);
+    }
+
+    return transfersForLonger;
+}
+
+void SolutionInkProblem::SleepASecond(int t)
+{
+#ifdef __WIN32__
+    Sleep(t*100);
+#else
+    std::this_thread::sleep_for(std::chrono::nanoseconds(t*100000000));
+#endif
+}
+
 bool SolutionInkProblem::Solve(bool animated)
 {
     char notSorted = 'C';
@@ -482,8 +531,6 @@ bool SolutionInkProblem::Solve(bool animated)
         for(int k = 0; k < j; k++)
             i++;
         actualInkType = (*i).GetInkType();
-
-        pointer = j;
 
         if(actualInkType != notSorted)
         {
@@ -503,7 +550,11 @@ bool SolutionInkProblem::Solve(bool animated)
                     string sShelf = ToString();
                     for(int i = length() - 6; i < length(); i++)
                         ShelfEnding += sShelf[i];
-                    string newTransfersString = LoadMovesFromFile("6result.txt",ShelfEnding);
+#ifdef __WIN32__
+                    string newTransfersString = LoadMovesFromFile("6resultWin.txt",ShelfEnding);
+#else
+                    string newTransfersString = LoadMovesFromFile("6resultLin.txt",ShelfEnding);
+#endif
                     list<int> newTransfers;
 
 
@@ -524,22 +575,8 @@ bool SolutionInkProblem::Solve(bool animated)
 
         j++;
     }
-    
+
     return true;
-}
-
-list<int> SolutionInkProblem::ScaleTransfersFrom6(string transfersFor6)
-{
-    list<int> transfersForLonger;
-    int transfer;
-
-    for(int i = 0; i < transfersFor6.length(); i++)
-    {
-        transfer = (int)transfersFor6[i] - (int)48;
-        transfersForLonger.push_back(transfer + length() - 6);
-    }
-
-    return transfersForLonger;
 }
 
 SolutionInkProblem &SolutionInkProblem::operator= ( SolutionInkProblem & isg)
@@ -588,7 +625,7 @@ ostream & operator<< ( ostream &out, SolutionInkProblem &isg)
     out << isg.shelf;
     out << isg.distance + (int)abs(isg.start-isg.pointer) << "\n" << isg.numberOfShifts << "\n";
     for(list<int>::iterator i = isg.transfers.begin(); i != isg.transfers.end(); i++)
-        out << isg.length() - (*i);
+        out << isg.length() - (*i) << " ";
     out << "\n";
     return out;
 }

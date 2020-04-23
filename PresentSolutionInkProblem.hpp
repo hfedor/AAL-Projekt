@@ -34,4 +34,6 @@ public:
     ~PresentSolutionInkProblem();
 };
 
+void StartProgram(int, char**);
+
 #endif // PRESENTSOLUTIONINKPROBLEM_HPP

@@ -1,4 +1,5 @@
 #include "PresentSolutionInkProblem.hpp"
+#include "Tests.hpp"
 
 #include <math.h>
 #include <string>
@@ -135,6 +136,137 @@ void PresentSolutionInkProblem::Solve(bool animated)
             cout << s << endl;
         }
     }
+}
+
+void StartProgram(int argNumb, char **arguments)
+{
+    for(int i = 0; i < argNumb; i++)
+        cout << arguments[i] << " ";
+    cout << endl;
+
+    if(argNumb == 1)
+		cout << "\tThe program sorting ink bottles.\n" <<
+			"\t\ttest\ttesting program\n" <<
+			"\t\tstring with only 'C', 'M', 'Y' and 'K' - sole given shelf (ex. solveInkProblem CCMYCK)\n" <<
+			"\t\tfile \"fileName.txt\" - solve every shelf infile with given name (ex. file = \"CYKCYM\\nYKCYK\\nKYMKNY...\")\n" <<
+			"\t\tnumb - generate randomly shelf with given length and solve it\n" <<
+			"\t\t\t anim - solve with animation\n" << endl;
+	if(argNumb == 2)
+	{
+		if(arguments[1] == "test")
+		{
+		    Tests t;
+		    t.testAll();
+		}
+
+		string args = arguments[1];
+
+		bool shelf = true;
+		for(int i = 0; i < args.length(); i++)
+		{
+			if(args[i] != 'C' && args[i] != 'M' && args[i] != 'Y' && args[i] != 'K')
+			{
+				shelf = false;
+				break;
+			}
+		}
+		if(shelf)
+		{
+			SolutionInkProblem sip(arguments[1]);
+			string oldShelf = sip.ToString();
+			sip.Solve(false);
+			cout << "\n" << oldShelf << " -> ";
+			sip.Print();
+			return;
+		}
+
+		bool numb = true;
+		if(args[0] < '1' || args[0] > '9')
+			numb = false;
+
+		if(numb)
+			for(int i = 1; i < args.length(); i++)
+			{
+
+				if(args[i] < '0' || args[i] > '9')
+				{
+					numb = false;
+					break;
+				}
+			}
+		if(numb)
+		{
+			SolutionInkProblem sip(atoi(arguments[1]));
+			string oldShelf = sip.ToString();
+			sip.Solve(false);
+			cout << "\n" << oldShelf << " -> ";
+			sip.Print();
+			return;
+		}
+
+		cout << "Wrong arguments!" << endl;
+	}
+	else if(argNumb == 3)
+	{
+		if(arguments[1] == "file")
+		{
+			PresentSolutionInkProblem psip(arguments[1]);
+			psip.Solve(false);
+			psip.Print();
+			cout << endl;
+			return;
+		}
+
+		if(arguments[2] != "anim")
+		{
+			string args = arguments[1];
+
+			bool shelf = true;
+			for(int i = 0; i < args.length(); i++)
+			{
+				if(args[i] != 'C' && args[i] != 'M' && args[i] != 'Y' && args[i] != 'K')
+				{
+					shelf = false;
+					break;
+				}
+			}
+			if(shelf)
+			{
+				SolutionInkProblem sip(arguments[1]);
+				string oldShelf = sip.ToString();
+				sip.Solve(true);
+				cout << "\n" << oldShelf << " -> ";
+				sip.Print();
+				return;
+			}
+
+			bool numb = true;
+			if(args[0] < '1' || args[0] > '9')
+				numb = false;
+
+			if(numb)
+				for(int i = 1; i < args.length(); i++)
+				{
+
+					if(args[i] < '0' || args[i] > '9')
+					{
+						numb = false;
+						break;
+					}
+				}
+			if(numb)
+			{
+				SolutionInkProblem sip(atoi(arguments[1]));
+				string oldShelf = sip.ToString();
+				sip.Solve(true);
+				cout << "\n" << oldShelf << " -> ";
+				sip.Print();
+				return;
+			}
+		}
+
+		cout << "Wrong arguments!" << endl;
+	}
 }
 
 PresentSolutionInkProblem::~PresentSolutionInkProblem()

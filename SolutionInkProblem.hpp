@@ -22,6 +22,7 @@ class SolutionInkProblem
         std::list<Ink>::iterator begin(){return shelf.begin();}
         bool Check(); // check the shelf
         std::list<Ink>::iterator end(){return shelf.end();}
+        void ClearTerminal();
         std::list<Ink>::iterator FindByNumber(int numb); // return Ink bottle by the number from the left
         int FindInkFrom(int actPos, char toFind); // find bottle with given ink type which could by moved by the arm of the machine to given position with minimizing the distance traveled
         std::list<int> GetTransfers(){return transfers;}
@@ -48,6 +49,7 @@ class SolutionInkProblem
         void PrintForPlay();
         void SaveToFile(std::fstream f);
         std::list<int> ScaleTransfersFrom6(std::string transfersFor6);
+        void SleepASecond(int);
         bool Solve(bool animated);
         std::string ToString(){return shelf.ToString();}
         SolutionInkProblem &operator= ( SolutionInkProblem & );

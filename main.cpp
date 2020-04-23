@@ -6,131 +6,127 @@
 
 using namespace std;
 
-int main(int argc, char **argv)
+#ifdef __WIN32__
+int main()
 {
-	if(argc == 1)
-		cout << "\tThe program sorting ink bottles.\n" <<
+    string s;
+    int argNumb;
+
+    cout << "\tThe program sorting ink bottles.\n" <<
 			"\t\ttest\ttesting program\n" <<
 			"\t\tstring with only 'C', 'M', 'Y' and 'K' - sole given shelf (ex. solveInkProblem CCMYCK)\n" <<
 			"\t\tfile \"fileName.txt\" - solve every shelf infile with given name (ex. file = \"CYKCYM\\nYKCYK\\nKYMKNY...\")\n" <<
 			"\t\tnumb - generate randomly shelf with given length and solve it\n" <<
-			"\t\t\t anim - solve with animation\n";
-	if(argc == 2)
-	{
-		if(argv[1] == "test")
-		{
-		    Tests t;
+			"\t\thelp - this text\n" <<
+			"\t\texit - close program\n";
+
+    while(1)
+    {
+        cout << "Enter arguments:" << endl;
+        cin >> s;
+
+        if(s == "help")
+            cout << "\tThe program sorting ink bottles.\n" <<
+                "\t\ttest\ttesting program\n" <<
+                "\t\tstring with only 'C', 'M', 'Y' and 'K' - sole given shelf (ex. solveInkProblem CCMYCK)\n" <<
+                "\t\tfile \"fileName.txt\" - solve every shelf infile with given name (ex. file = \"CYKCYM\\nYKCYK\\nKYMKNY...\")\n" <<
+                "\t\tnumb - generate randomly shelf with given length and solve it\n" <<
+                "\t\thelp - this text\n" <<
+                "\t\texit - close program\n" << endl;
+        else if(s == "exit")
+            return 0;
+        else if(s == "test")
+        {
+            Tests t;
 		    t.testAll();
-		}
+        }
+        else if(s == "file")
+        {
+            cin >> s;
+            PresentSolutionInkProblem psip(s);
+            cout << "Animate?[Y/N]" << endl;
 
-		string args = argv[1];
+            cin >> s;
 
-		bool shelf = true;
-		for(int i = 0; i < args.length(); i++)
-		{
-			if(args[i] != 'C' && args[i] != 'M' && args[i] != 'Y' && args[i] != 'K')
-			{
-				shelf = false;
-				break;
-			}
-		}
-		if(shelf)
-		{
-			SolutionInkProblem sip(argv[1]);
-			string oldShelf = sip.ToString();
-			sip.Solve(false);
-			cout << "\n" << oldShelf << " -> ";
-			sip.Print();
-			return 0;
-		}
+            if(s != "Y" && s != "N")
+                return 0;
 
-		bool numb = true;
-		if(args[0] < '1' || args[0] > '9')
-			numb = false;
-	
-		if(numb)
-			for(int i = 1; i < args.length(); i++)
-			{
-				
-				if(args[i] < '0' || args[i] > '9')
-				{
-					numb = false;
-					break;
-				}
-			}
-		if(numb)
-		{
-			SolutionInkProblem sip(atoi(argv[1]));
-			string oldShelf = sip.ToString();
-			sip.Solve(false);
-			cout << "\n" << oldShelf << " -> ";
-			sip.Print();
-			return 0;
-		}
+            psip.Solve(s == "Y");
 
-		cout << "Wrong arguments!" << endl;
-	}
-	else if(argc == 3)
-	{
-		if(argv[1] == "file")		
-		{
-			PresentSolutionInkProblem psip(argv[1]);
-			psip.Solve(false);
-			psip.Print();
-			cout << endl;
-			return 0;
-		}
+            psip.Print();
+            return 0;
+        }
+        else
+        {
+            bool shelf = true;
+            for(int i = 0; i < s.length(); i++)
+            {
+                if(s[i] != 'C' && s[i] != 'M' && s[i] != 'Y' && s[i] != 'K')
+                {
+                    shelf = false;
+                    break;
+                }
+            }
+            if(shelf)
+            {
+                SolutionInkProblem sip(s);
+                string oldShelf = sip.ToString();
+                cout << "Animate?[Y/N]" << endl;
 
-		if(argv[2] != "anim")
-		{
-			string args = argv[1];
+                cin >> s;
 
-			bool shelf = true;
-			for(int i = 0; i < args.length(); i++)
-			{
-				if(args[i] != 'C' && args[i] != 'M' && args[i] != 'Y' && args[i] != 'K')
-				{
-					shelf = false;
-					break;
-				}
-			}
-			if(shelf)
-			{
-				SolutionInkProblem sip(argv[1]);
-				string oldShelf = sip.ToString();
-				sip.Solve(true);
-				cout << "\n" << oldShelf << " -> ";
-				sip.Print();
-				return 0;
-			}
+                if(s != "Y" && s != "N")
+                    return 0;
 
-			bool numb = true;
-			if(args[0] < '1' || args[0] > '9')
-				numb = false;
-		
-			if(numb)
-				for(int i = 1; i < args.length(); i++)
-				{
-					
-					if(args[i] < '0' || args[i] > '9')
-					{
-						numb = false;
-						break;
-					}
-				}
-			if(numb)
-			{
-				SolutionInkProblem sip(atoi(argv[1]));
-				string oldShelf = sip.ToString();
-				sip.Solve(true);
-				cout << "\n" << oldShelf << " -> ";
-				sip.Print();
-				return 0;
-			}
-		}
+                sip.Solve(s == "Y");
 
-		cout << "Wrong arguments!" << endl;
-	}	
+                cout << "\n" << oldShelf << " -> ";
+                sip.Print();
+                return 0;
+            }
+
+            bool numb = true;
+            if(s[0] < '1' || s[0] > '9')
+                numb = false;
+
+            if(numb)
+                for(int i = 1; i < s.length(); i++)
+                {
+
+                    if(s[i] < '0' || s[i] > '9')
+                    {
+                        numb = false;
+                        break;
+                    }
+                }
+            if(numb)
+            {
+                SolutionInkProblem sip(stoi(s));
+                string oldShelf = sip.ToString();
+
+                while(s != "Y" && s != "N" && s != "y" && s != "n")
+                {
+                    cout << "Animate?[Y/N]" << endl;
+
+                    cin >> s;
+                }
+
+                sip.Solve(s == "Y" || s == "y");
+
+                cout << "\n" << oldShelf << " -> ";
+                sip.Print();
+                return 0;
+            }
+        }
+    }
 
     return 0;
 }
+#else
+int main(int argc, char **argv)
+{
+    StartProgram(argc,argv);
+
+    return 0;
+}
+#endif

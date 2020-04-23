@@ -1,5 +1,5 @@
 all: Ink.o Shelf.o SolutionInkProblem.o PresentSolutionInkProblem.o
-	$(g++) Ink.o Shelf.o SolutionInkProblem.o PresentSolutionInkProblem.o -o test
+	$(g++) Ink.o Shelf.o SolutionInkProblem.o PresentSolutionInkProblem.o -o solveInkProblem
 
 Ink.o: Ink.c Ink.hpp
 	$(g++) Ink.c -c -o Ink.o
