@@ -525,6 +525,12 @@ bool SolutionInkProblem::Solve(bool animated)
     list<Ink>::iterator i = shelf.begin();
     char actualInkType;
 
+    if(length() < 6)
+    {
+        cout << "Shelf with less then 6 ink bottles can not by sorted!" << endl;
+        return false;
+    }
+
     while(i != shelf.end())
     {
         i = shelf.begin();
