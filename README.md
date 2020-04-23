@@ -3,7 +3,6 @@
 Hubert Fedorowicz
 
 Uruchamianie:
-•	Windows 	- program.exe;
 •	Linux 		- make all i solveInkProblem.
 
 Treść zadania:
