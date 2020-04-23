@@ -1,7 +1,7 @@
 CXX = g++
 
 all: clean 6result.txt Ink.o Shelf.o SolutionInkProblem.o PresentSolutionInkProblem.o Tests.o main.o
-	$(CXX) Ink.o Shelf.o SolutionInkProblem.o PresentSolutionInkProblem.o Tests.o main.o -o test
+	$(CXX) Ink.o Shelf.o SolutionInkProblem.o PresentSolutionInkProblem.o Tests.o main.o -o solveInkProblem
 
 Ink.o: Ink.cpp Ink.hpp
 	$(CXX) Ink.cpp -c -o Ink.o
