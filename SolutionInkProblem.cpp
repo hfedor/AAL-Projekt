@@ -318,6 +318,8 @@ char SolutionInkProblem::NextToSort(char &actual)
             return actual = '0';
             break;
     }
+    
+    return '0';
 }
 
 int SolutionInkProblem::PointerLeft()
