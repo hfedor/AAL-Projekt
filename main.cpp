@@ -10,6 +10,7 @@ using namespace std;
 int main()
 {
     string s;
+    int m;
     int argNumb;
 
     cout << "\tThe program sorting ink bottles.\n" <<
@@ -17,6 +18,7 @@ int main()
 			"\t\tstring with only 'C', 'M', 'Y' and 'K' - solve given shelf (ex. solveInkProblem CCMYCK)\n" <<
 			"\t\tfile \"fileName.txt\" - solve every shelf infile with given name (ex. file = \"CYKCYM\\nYKCYK\\nKYMKNY...\")\n" <<
 			"\t\tnumb - generate randomly shelf with given length and solve it\n" <<
+			"\t\t<n1,n2> - solve shelves with lengths from n1 to n2\m" <<
 			"\t\thelp - this text\n" <<
 			"\t\texit - close program\n";
 
@@ -51,7 +53,7 @@ int main()
             if(s != "Y" && s != "N")
                 return 0;
 
-            psip.Solve(s == "Y");
+            psip.Solve(m, s == "Y");
 
             psip.Print();
             return 0;
@@ -69,19 +71,27 @@ int main()
             }
             if(shelf)
             {
-                SolutionInkProblem sip(s);
-                string oldShelf = sip.ToString();
+                PresentSolutionInkProblem psip(1,s);
+                string oldShelf = s;
                 cout << "Animate?[Y/N]" << endl;
 
                 cin >> s;
 
-                if(s != "Y" && s != "N")
-                    return 0;
+                while(s != "Y" && s != "N" && s != "y" && s != "n")
+                {
+                    cout << "Animate?[Y/N]" << endl;
 
-                sip.Solve(s == "Y");
+                    cin >> s;
+                }
+
+                cout << "With mode?" << endl;
+
+                cin >> m;
+
+                psip.Solve(m,s == "Y" || s == "y");
 
                 cout << "\n" << oldShelf << " -> ";
-                sip.Print();
+                psip.Print();
                 return 0;
             }
 
@@ -91,18 +101,15 @@ int main()
 
             if(numb)
                 for(int i = 1; i < s.length(); i++)
-                {
-
                     if(s[i] < '0' || s[i] > '9')
                     {
                         numb = false;
                         break;
                     }
-                }
             if(numb)
             {
-                SolutionInkProblem sip(stoi(s));
-                string oldShelf = sip.ToString();
+                PresentSolutionInkProblem psip(6,stoi(s));
+                string oldShelf = s;
 
                 while(s != "Y" && s != "N" && s != "y" && s != "n")
                 {
@@ -111,10 +118,62 @@ int main()
                     cin >> s;
                 }
 
-                sip.Solve(s == "Y" || s == "y");
+                cout << "With mode?" << endl;
 
-                cout << "\n" << oldShelf << " -> ";
-                sip.Print();
+                cin >> m;
+
+                psip.Solve(m, s == "Y" || s == "y");
+
+                return 0;
+            }
+
+            bool range = false;
+
+            if(s[0] == '<')
+                range = true;
+            int i = 1;
+            int n1, n2;
+            string n1s = "", n2s = "";
+            while(range)
+            {
+                if(s[i] == ',')
+                {
+                    if(n1s != "")
+                        n1 = stoi(n1s);
+                    i++;
+                    break;
+                }
+                if(s[i] < '0' || s[i] > '9')
+                    range = false;
+                n1s += s[i];
+                i++;
+            }
+            while(range)
+            {
+                if(s[i] == '>')
+                {
+                    if(n2s != "")
+                        n2 = stoi(n2s);
+                    break;
+                }
+                if(s[i] < '0' || s[i] > '9')
+                    range = false;
+                n2s += s[i];
+                i++;
+            }
+            if(range && n1 > n2)
+            {
+                range = false;
+                cout << "n1(" << n1 << ") > n2(" << n2 << ")!" << endl;
+            }
+
+            if(range)
+            {
+                PresentSolutionInkProblem psip;
+                string oldShelf = s;
+
+                psip.SolveN(n1,n2);
+
                 return 0;
             }
         }

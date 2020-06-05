@@ -73,9 +73,88 @@ bool Shelf::Check()
     return true;
 }
 
+bool Shelf::Check(int firsts)
+{
+    if(inks.size() <= 1)
+        return true;
+
+    list<Ink>::iterator scd = begin(); // iterator for next ink bottle on the shelf behind the currently checked bottle
+    scd++; // set iterator j on second Ink on the shelf
+    int i = 0;
+
+    for(list<Ink>::iterator fst = begin(); scd != end() && i < firsts; fst++) //checking each pair of bottles lying next to each other on the shelf
+    {
+        if((*fst) < (*scd)) // if second bottle has "bigger" ink type then first bottle
+            return false;
+        scd++;
+        i++;
+    }
+    return true;
+}
+
+int Shelf::FindInkFrom(int actPos, char toFind)
+{
+    string s = ToString();
+
+    /*
+        try to find bottle with given ink type which stands in a position
+        distant from the current position with a multiple of 4.
+        Bottles in those positions are the easiest to transport to current
+        position by the machine.
+    */
+    for(int i = actPos; i < length(); i += 4)
+        if(s[i] == toFind)
+            return i;
+
+    /*
+        try to find bottle with given ink type which does not stands in a position
+        distant from the current position with a multiple of 4.
+    */
+    for(int i = length(); i > actPos; i--)
+    	if(s[i] == toFind)
+      	     return i;
+
+    return actPos; // if there is no bottle with given ink type return actual position
+}
+
+Ink Shelf::GetInk(int pos)
+{
+    int i = 0;
+    for(list<Ink>::iterator j = inks.begin(); j != inks.end(); j++)
+        if(i >= pos)
+            return (*j);
+        else
+            i++;
+}
+
 bool Shelf::IsMoveable(int first)
 {
     return !(first >= inks.size()-4); // if first given bottle is one of the last four bottles on the shelf
+}
+
+bool Shelf::IsLast5Solvable()
+{
+    bool tmp = false;
+    Ink lowest('C');
+    list<Ink>::iterator i = inks.begin();
+    for(int j = 0; j < length(); j++)
+    {
+        if((*i)!= lowest)
+        {
+            if((*i) > lowest)
+            {
+                if(!tmp)
+                    tmp = true;
+                else
+                    return false;
+            }
+            lowest = (*i);
+
+        }
+
+        i++;
+    }
+    return true;
 }
 
 bool Shelf::Move4InksBottles(int first)
@@ -285,4 +364,10 @@ ostream & operator<< ( ostream &out, Shelf &shelf)
     return out;
 }
 
-
+std::list<Ink>::iterator Shelf::operator[](int j)
+{
+    list<Ink>::iterator i = inks.begin();
+    for(int k = 0; k < j; k++)
+        i++;
+    return i;
+}

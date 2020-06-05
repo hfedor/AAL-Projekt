@@ -4,8 +4,16 @@
 #include <math.h>
 #include <string>
 #include <fstream>
+#include <chrono>
+#include "table_printer.h"
 
 using namespace std;
+using namespace std::chrono;
+
+PresentSolutionInkProblem::PresentSolutionInkProblem()
+{
+
+}
 
 PresentSolutionInkProblem::PresentSolutionInkProblem(int solutionNmb, int inksNumb)
 {
@@ -122,14 +130,141 @@ void PresentSolutionInkProblem::Sortsolutions()
     }
 }
 
-void PresentSolutionInkProblem::Solve(bool animated)
+void PresentSolutionInkProblem::Solve(int mode, bool animated)
+{
+    string s;
+
+    if(animated)
+        AddSolution(s);
+
+    if(animated)
+        solutions.front()->Solve(mode,animated);
+
+    list<SolutionInkProblem*>::iterator g = GetBegin();
+    if(animated)
+        g++;
+    int i = 1;
+    for(; g != GetEnd(); g++)
+    {
+        cout << "\nmode: " << i << endl;
+
+        steady_clock::time_point t = steady_clock::now();
+
+        (*g)->Solve(i,false);
+
+        steady_clock::duration d = steady_clock::now()-t;
+        (*g)->SetDuration(d);
+
+        if((*g)->Check())
+        {
+            cout << s << endl;
+            (*g)->Print();
+        }
+
+        i++;
+    }
+}
+
+void PresentSolutionInkProblem::SolveN(int n1, int n2)
+{
+    string s;
+
+    for(int i = n1; i <= n2; i++)
+    {
+        SolutionInkProblem sip(i);
+        s = sip.ToString();
+        for(int j = 0; j < 6; j++)
+            AddSolution(s);
+    }
+
+    list<SolutionInkProblem*>::iterator g = GetBegin();
+    int i = 0;
+    for(; g != GetEnd(); g++)
+    {
+        steady_clock::time_point t = steady_clock::now();
+
+        (*g)->Solve(i%6 + 1,false);
+
+        steady_clock::duration d = steady_clock::now()-t;
+        (*g)->SetDuration(d);
+
+        i++;
+    }
+
+    bprinter::TablePrinter tp(&std::cout,"|");
+    tp.AddColumn("Mode1", n2);
+    tp.AddColumn("Mode2", 5);
+    tp.AddColumn("Mode3", 5);
+    tp.AddColumn("Mode4", 10);
+
+    tp.PrintHeader();
+    for(g = GetBegin(); g != GetEnd(); g++)
+    {
+        tp << (*g)->ToString() << (*g)->GetDistance() << (*g)->GetNumberOfShifts() << duration_cast<nanoseconds>((*g)->GetDuration()).count();
+    }
+    tp << bprinter::endl();
+    tp.PrintFooter();
+    /*
+    i = 0;
+    g = GetBegin();
+    string tabs = "\t";
+    string line = "--------------";
+    for(int j = 0; j < ((n2 + 1)-((n2 + 1)%16))/16; j++)
+    {
+        tabs += "\t";
+        line += "--------------";
+    }
+    string line2 = line;
+    for(int j = 0; j < 6; j++)
+    {
+        line += line2;
+    }
+    line += "\n";
+    for(int j = n1; j <= n2; j++)
+    {
+        list<SolutionInkProblem*>::iterator tmp = g;
+        cout << line;
+        for(int l = 0; l < 6; l++)
+        {
+            cout << (*g)->ToString() << tabs <<"|";
+            g++;
+        }
+        g = tmp;
+        cout << "\n|";
+        for(int l = 0; l < 6; l++)
+        {
+            cout << (*g)->GetDistance() << tabs << "\t|";
+            g++;
+        }
+        cout << "\n|";
+        g = tmp;
+        for(int l = 0; l < 6; l++)
+        {
+            cout << (*g)->GetNumberOfShifts() << tabs << "\t|";
+            g++;
+        }
+        cout << "\n|";
+        g = tmp;
+        for(int l = 0; l < 6; l++)
+        {
+            cout << duration_cast<microseconds>((*g)->GetDuration()).count() << tabs << "\t|";
+            g++;
+        }
+        cout << "\n";
+    }
+    cout << line;*/
+
+}
+
+void PresentSolutionInkProblem::SolveBrutal(bool animated)
 {
     string s;
     for(list<SolutionInkProblem*>::iterator g = GetBegin(); g != GetEnd(); g++)
     {
         s = (*g)->ToString();
         for(int i = 0; i < (*g)->length() - 4; i++)
-            (*g)->Solve(animated);
+            (*g)->SolveBrutal(animated);
+
         if(!(*g)->Check())
         {
             cout << (*g)->ToString() << "\t";
@@ -174,7 +309,7 @@ void StartProgram(int argNumb, char **arguments)
 		{
 			SolutionInkProblem sip(arguments[1]);
 			string oldShelf = sip.ToString();
-			sip.Solve(false);
+			sip.Solve(1,false);
 			cout << "\n" << oldShelf << " -> ";
 			sip.Print();
 			return;
@@ -198,7 +333,7 @@ void StartProgram(int argNumb, char **arguments)
 		{
 			SolutionInkProblem sip(atoi(arguments[1]));
 			string oldShelf = sip.ToString();
-			sip.Solve(false);
+			sip.Solve(1,false);
 			cout << "\n" << oldShelf << " -> ";
 			sip.Print();
 			return;
@@ -211,7 +346,7 @@ void StartProgram(int argNumb, char **arguments)
 		if(arguments[1] == "file")
 		{
 			PresentSolutionInkProblem psip(arguments[1]);
-			psip.Solve(false);
+			psip.Solve(1,false);
 			psip.Print();
 			cout << endl;
 			return;
@@ -234,7 +369,7 @@ void StartProgram(int argNumb, char **arguments)
 			{
 				SolutionInkProblem sip(arguments[1]);
 				string oldShelf = sip.ToString();
-				sip.Solve(true);
+				sip.Solve(1,true);
 				cout << "\n" << oldShelf << " -> ";
 				sip.Print();
 				return;
@@ -258,7 +393,7 @@ void StartProgram(int argNumb, char **arguments)
 			{
 				SolutionInkProblem sip(atoi(arguments[1]));
 				string oldShelf = sip.ToString();
-				sip.Solve(true);
+				sip.Solve(1,true);
 				cout << "\n" << oldShelf << " -> ";
 				sip.Print();
 				return;

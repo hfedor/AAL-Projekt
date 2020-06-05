@@ -1,0 +1,14 @@
+all: Ink.o Shelf.o SolutionInkProblem.o PresentSolutionInkProblem.o
+	$(g++) Ink.o Shelf.o SolutionInkProblem.o PresentSolutionInkProblem.o -o solveInkProblem
+
+Ink.o: Ink.c Ink.hpp
+	$(g++) Ink.c -c -o Ink.o
+
+Shelf.o: Shelf.c Shelf.hpp Ink.hpp
+	$(g++) Shelf.c -c -o Shelf.o
+
+SolutionInkProblem.o: SolutionInkProblem.c SolutionInkProblem.hpp Shelf.hpp
+	$(g++) SolutionInkProblem.c -c -o SolutionInkProblem.o
+
+PresentSolutionInkProblem.o: PresentSolutionInkProblem.c PresentSolutionInkProblem.hpp SolutionInkProblem.hpp
+	$(g++) PresentSolutionInkProblem.c -c -o PresentSolutionInkProblem.o

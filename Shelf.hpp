@@ -22,9 +22,13 @@ class Shelf
         void BuildShelf(int inksNumb); // add given number of bottles with random inks on the shelf
         void BuildShelf(std::string new_shelf); // add bottles on the shelf like in given string (for ex. "CCMYKCM" is shelf with 7 inks - fist ink type C, second ink type C, ... and last ink type M)
         bool Check(); // check if the bottles on the shelf meet the task requirements
+        bool Check(int firsts); // check if firsts bottles on the shelf meet the task requirements
         void clear(){inks.clear();} // clear the shelf from the bottles
         bool empty(){return inks.empty();} // check is shelf is empty
         bool IsMoveable(int first); // check if given ink bottles can by transfered
+        bool IsLast5Solvable();
+        int FindInkFrom(int actPos, char toFind); // find bottle with given ink type which could by moved by the arm of the machine to given position with minimizing the distance traveled
+        Ink GetInk(int pos);
         bool Move4InksBottles(int first); // take 4 ink bottles in the row (starting with first given from the left, counting from the left side of the shelf from zero) and put it on the right side of the dhelf
         int length(); // return length of the shelf
         void Print(); // print the shelf
@@ -41,6 +45,7 @@ class Shelf
         bool operator<= (Shelf &); // compare which shelf is more ordered from the left
         friend std::ostream & operator<< (std::ostream &out, Shelf &shelf);
         friend std::istream & operator>> (std::istream &in, Shelf &shelf);
+        std::list<Ink>::iterator operator[](int el);
 
     protected:
 

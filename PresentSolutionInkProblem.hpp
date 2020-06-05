@@ -13,6 +13,7 @@ class PresentSolutionInkProblem
 private:
     std::list<SolutionInkProblem*> solutions; // list of solved problem of sorting ink bottles
 public:
+    PresentSolutionInkProblem();
     PresentSolutionInkProblem(int solutionsNumb, int inksNumb); // construct given number of solutions with given numbers of ink bottles
     PresentSolutionInkProblem(int SolutionsNumb, std::string newShelf); // construct given number of solutions with given shelf
     PresentSolutionInkProblem(std::string fileNama); // load solutions from file with given name
@@ -29,7 +30,9 @@ public:
     void PrintShelf();
     void Savesolutions(std::string fileName);
     void Sortsolutions();
-    void Solve(bool animated);
+    void Solve(int mode, bool animated);
+    void SolveN(int n1, int n2);
+    void SolveBrutal(bool animated);
     int numb(){return solutions.size();}
     ~PresentSolutionInkProblem();
 };

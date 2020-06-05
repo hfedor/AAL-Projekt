@@ -234,7 +234,7 @@ bool Tests::SolutionInkProblemTest()
             //throw PreperExceptionData("SolutionInkProblem","ScaleTransfersFrom6","Transfer was not scaled properly!");
 
         sip2 = sip4;
-        if(!sip4.Solve(false))
+        if(!sip4.Solve(1,false))
 	    throw PreperExceptionData("SolutionInkProblem","Solve","Can not solve!");
 
         if(!(sip4.ToString() == sip2.GetShelf().Sort()))
@@ -390,7 +390,7 @@ bool Tests::PresentSolutionInkProblemTest()
     {
         PresentSolutionInkProblem psip("every7.txt");
 
-        psip.Solve(false);
+        psip.Solve(1,false);
 
 
     }
