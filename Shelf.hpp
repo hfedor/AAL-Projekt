@@ -32,6 +32,7 @@ class Shelf
         bool Move4InksBottles(int first); // take 4 ink bottles in the row (starting with first given from the left, counting from the left side of the shelf from zero) and put it on the right side of the dhelf
         int length(); // return length of the shelf
         void Print(); // print the shelf
+        bool ReversMove4InksBottles(int first);
         std::string Sort(); // return state of the shelf with bottles sorted in accordance with the requirements of the tasks
         std::string ToString(); // return string representing ink bottles setting on the shelf
         std::list<Ink>::iterator begin(){return inks.begin();} // return begin of the list of inks

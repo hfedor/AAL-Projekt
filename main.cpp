@@ -90,8 +90,6 @@ int main()
 
                 psip.Solve(m,s == "Y" || s == "y");
 
-                cout << "\n" << oldShelf << " -> ";
-                psip.Print();
                 return 0;
             }
 
@@ -108,7 +106,7 @@ int main()
                     }
             if(numb)
             {
-                PresentSolutionInkProblem psip(6,stoi(s));
+                PresentSolutionInkProblem psip(1,stoi(s));
                 string oldShelf = s;
 
                 while(s != "Y" && s != "N" && s != "y" && s != "n")

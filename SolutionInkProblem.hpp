@@ -5,6 +5,14 @@
 #include <fstream>
 #include <chrono>
 
+#ifdef __WIN32__
+
+#include <windows.h>
+
+#else
+
+#endif
+
 /*
     Class for solving problem of sorting ink bottles by the machine described in the task.
 */
@@ -17,7 +25,9 @@ class SolutionInkProblem
         int numberOfShifts; // number of ink bottles transfers made by the chine
         int start; // position where the arm of the machine starts
         std::list<int> transfers; // list of ink bottles (firsts of them from the left) moved by the arm of the machine
-        std::chrono::steady_clock::duration duration;
+        //std::chrono::steady_clock::duration duration;
+        LARGE_INTEGER duration;
+        std::string shelfOnBegining;
     public:
         SolutionInkProblem(int inksNumb); // constructor with given number of ink bottles on the constructed shelf
         SolutionInkProblem(std::string new_shelf); // constructor with given ink bottles on the constructed shelf
@@ -35,12 +45,14 @@ class SolutionInkProblem
         std::list<int> GetTransfers(){return transfers;}
         std::string GetTransfersByString();
         int GetDistance(){return distance;}
-        std::chrono::steady_clock::duration GetDuration(){return duration;}
+        //std::chrono::steady_clock::duration GetDuration(){return duration;}
+        LARGE_INTEGER GetDuration(){return duration;}
         int GetNumberOfShifts(){return numberOfShifts;}
         int GetPointer(){return pointer;}
         int GetStart(){return start = shelf.length() - 4;}
         int GetPermutationLevel(){return length() - start;}
         Shelf GetShelf(){return shelf;}
+        std::string GetShelfOnBegining(){return shelfOnBegining;}
         int length(){return shelf.length();}
         std::string LoadMovesFromFile(std::string fileName, std::string sShelf);
         int MovePointer(int newPosition, bool animated);
@@ -55,9 +67,11 @@ class SolutionInkProblem
         void Print();
         void PrintForAnimation(int sted);
         void PrintForPlay();
+        bool RandomlyComplicate();
         void SaveToFile(std::fstream f);
         std::list<int> ScaleTransfersFrom6(std::string transfersFor6);
-        void SetDuration(std::chrono::steady_clock::duration d){duration = d;}
+        //void SetDuration(std::chrono::steady_clock::duration d){duration = d;}
+        void SetDuration(LARGE_INTEGER d){duration = d;}
         void SleepASecond(int);
         bool Solve(int mode, bool animated);
         bool Solve(char biggestInBegin, int mode, bool animated);
@@ -69,6 +83,7 @@ class SolutionInkProblem
         bool SolveLast6Brutal(bool animated);
         bool SolveLast6Brutal(bool animated, int firsts);
         bool SolveLast6List(bool animated);
+        bool Sort(){shelf.Sort();};
         std::string ToString(){return shelf.ToString();}
         SolutionInkProblem &operator= ( SolutionInkProblem & );
         bool operator== ( std::string & );

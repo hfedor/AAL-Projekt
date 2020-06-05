@@ -32,6 +32,7 @@ public:
     void Sortsolutions();
     void Solve(int mode, bool animated);
     void SolveN(int n1, int n2);
+    void SolveN(int length, int n1, int n2);
     void SolveBrutal(bool animated);
     int numb(){return solutions.size();}
     ~PresentSolutionInkProblem();

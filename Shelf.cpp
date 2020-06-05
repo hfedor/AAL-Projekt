@@ -191,6 +191,27 @@ void Shelf::Print()
     cout << endl;
 }
 
+bool Shelf::ReversMove4InksBottles(int to)
+{
+    if(to >= inks.size()-4) // if to given bottle is one of the last four bottles on the shelf
+        return false;
+
+    int inkNumb = 0;
+    list<Ink>::iterator inkIterator = begin(); // iterator for bottle with given first number
+    while(inkNumb<to && inkIterator != end()) // while inkIterator does not point to given first ink bottle
+    {
+        inkNumb++;
+        inkIterator++;
+    }
+
+    list<Ink>::iterator first = begin(); // iterator for first bottle behind bottle to be moved
+    for(inkNumb = 0; inkNumb < length() - 4; inkNumb++)
+        first++;
+
+    inks.splice(inkIterator,inks,(list<Ink>::iterator)first,end()); // move bottles
+    return true;
+}
+
 string Shelf::Sort()
 {
     /* Bubble Sort */

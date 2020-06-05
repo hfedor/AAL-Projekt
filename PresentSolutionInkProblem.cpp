@@ -6,6 +6,15 @@
 #include <fstream>
 #include <chrono>
 #include "table_printer.h"
+#include <cstdint>
+
+#ifdef __WIN32__
+
+#include <windows.h>
+
+#else
+
+#endif
 
 using namespace std;
 using namespace std::chrono;
@@ -143,36 +152,99 @@ void PresentSolutionInkProblem::Solve(int mode, bool animated)
     list<SolutionInkProblem*>::iterator g = GetBegin();
     if(animated)
         g++;
-    int i = 1;
-    for(; g != GetEnd(); g++)
+
+    //steady_clock::time_point t = steady_clock::now();
+    LARGE_INTEGER nStartTime;
+    LARGE_INTEGER nStopTime;
+    LARGE_INTEGER nElapsed;
+    LARGE_INTEGER nFrequency;
+
+    ::QueryPerformanceFrequency(&nFrequency);
+    ::QueryPerformanceCounter(&nStartTime);
+
+    //steady_clock::time_point t1 = steady_clock::now();
+    //high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
+    (*g)->Solve(mode,false);
+
+    ::QueryPerformanceCounter(&nStopTime);
+    nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
+    nElapsed.QuadPart /= nFrequency.QuadPart;
+
+    //steady_clock::time_point t2 = steady_clock::now();
+    //steady_clock::duration d = t2-t1;
+    //high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    //cout << duration_cast<microseconds>(t).count() << endl;
+    //cout << duration_cast<microseconds>(d).count() << endl;
+    (*g)->SetDuration(nElapsed);
+    //steady_clock::duration d = steady_clock::now()-t;
+    //(*g)->SetDuration(d);
+
+    if((*g)->Check())
     {
-        cout << "\nmode: " << i << endl;
-
-        steady_clock::time_point t = steady_clock::now();
-
-        (*g)->Solve(i,false);
-
-        steady_clock::duration d = steady_clock::now()-t;
-        (*g)->SetDuration(d);
-
-        if((*g)->Check())
-        {
-            cout << s << endl;
-            (*g)->Print();
-        }
-
-        i++;
+        cout << s << endl;
+        (*g)->Print();
     }
 }
 
 void PresentSolutionInkProblem::SolveN(int n1, int n2)
 {
-    string s;
+    string s, stmp1, stmp2;
 
-    for(int i = n1; i <= n2; i++)
+    Shelf shelfTmp1(n1 - 1);
+
+    s = shelfTmp1.ToString();
+
+    srand(time(NULL));
+
+    for(int n = n1; n <= n2; n++)
     {
-        SolutionInkProblem sip(i);
-        s = sip.ToString();
+        int iter = rand()%s.length();
+        for(int i = s.length()-1; i >= 0; i--)
+        {
+            stmp1 = "";
+
+            if(i == 0)
+            {
+                if(s[iter] == 'C')
+                    stmp1 += 'M';
+                else if(s[iter] == 'Y')
+                    stmp1 += 'K';
+                else
+                    stmp1 += 'Y';
+
+                stmp1 += s;
+                break;
+            }
+
+            stmp2 = s[iter-1] + s[iter];
+            Shelf shelfTmp2(stmp2);
+            if(shelfTmp2.Check())
+            {
+                for(int j = 0; j < iter; j++)
+                    stmp1 += s[j];
+                if(s[i] == 'C')
+                    stmp1 += 'M';
+                else if(s[iter] == 'M')
+                    stmp1 += 'Y';
+                else if(s[iter] == 'Y')
+                    stmp1 += 'K';
+                else
+                    stmp1 += 'C';
+                for(int j = iter; j < s.length(); j++)
+                    stmp1 += s[j];
+                break;
+            }
+
+            iter--;
+            if(iter <= 0)
+                iter = s.length() - 1;
+        }
+
+
+        s = stmp1;
+
+        SolutionInkProblem sip(s);
         for(int j = 0; j < 6; j++)
             AddSolution(s);
     }
@@ -181,29 +253,175 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
     int i = 0;
     for(; g != GetEnd(); g++)
     {
-        steady_clock::time_point t = steady_clock::now();
+        LARGE_INTEGER nStartTime;
+        LARGE_INTEGER nStopTime;
+        LARGE_INTEGER nElapsed;
+        LARGE_INTEGER nFrequency;
+
+        ::QueryPerformanceFrequency(&nFrequency);
+        ::QueryPerformanceCounter(&nStartTime);
+
+        //steady_clock::time_point t1 = steady_clock::now();
+        //high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
         (*g)->Solve(i%6 + 1,false);
 
-        steady_clock::duration d = steady_clock::now()-t;
-        (*g)->SetDuration(d);
+        ::QueryPerformanceCounter(&nStopTime);
+        nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
+        nElapsed.QuadPart /= nFrequency.QuadPart;
+
+        //steady_clock::time_point t2 = steady_clock::now();
+        //steady_clock::duration d = t2-t1;
+        //high_resolution_clock::time_point t2 = high_resolution_clock::now();
+        //cout << duration_cast<microseconds>(t).count() << endl;
+        //cout << duration_cast<microseconds>(d).count() << endl;
+        (*g)->SetDuration(nElapsed);
 
         i++;
     }
 
     bprinter::TablePrinter tp(&std::cout,"|");
     tp.AddColumn("Mode1", n2);
+    tp.AddColumn("Mode1", n2);
     tp.AddColumn("Mode2", 5);
     tp.AddColumn("Mode3", 5);
     tp.AddColumn("Mode4", 10);
 
     tp.PrintHeader();
+    i = 0;
     for(g = GetBegin(); g != GetEnd(); g++)
     {
-        tp << (*g)->ToString() << (*g)->GetDistance() << (*g)->GetNumberOfShifts() << duration_cast<nanoseconds>((*g)->GetDuration()).count();
+        //int64_t c =
+        tp << (*g)->GetShelfOnBegining() << (*g)->ToString() << (*g)->GetDistance() << (*g)->GetNumberOfShifts() << /*duration_cast<microseconds>(*/((*g)->GetDuration()).QuadPart /*).count()*/;
+        if(i%6 == 5)
+            tp.PrintFooter();
+        i++;
     }
-    tp << bprinter::endl();
+    if(i%6 != 0)
+        tp << bprinter::endl();
     tp.PrintFooter();
+
+    /*
+    i = 0;
+    g = GetBegin();
+    string tabs = "\t";
+    string line = "--------------";
+    for(int j = 0; j < ((n2 + 1)-((n2 + 1)%16))/16; j++)
+    {
+        tabs += "\t";
+        line += "--------------";
+    }
+    string line2 = line;
+    for(int j = 0; j < 6; j++)
+    {
+        line += line2;
+    }
+    line += "\n";
+    for(int j = n1; j <= n2; j++)
+    {
+        list<SolutionInkProblem*>::iterator tmp = g;
+        cout << line;
+        for(int l = 0; l < 6; l++)
+        {
+            cout << (*g)->ToString() << tabs <<"|";
+            g++;
+        }
+        g = tmp;
+        cout << "\n|";
+        for(int l = 0; l < 6; l++)
+        {
+            cout << (*g)->GetDistance() << tabs << "\t|";
+            g++;
+        }
+        cout << "\n|";
+        g = tmp;
+        for(int l = 0; l < 6; l++)
+        {
+            cout << (*g)->GetNumberOfShifts() << tabs << "\t|";
+            g++;
+        }
+        cout << "\n|";
+        g = tmp;
+        for(int l = 0; l < 6; l++)
+        {
+            cout << duration_cast<microseconds>((*g)->GetDuration()).count() << tabs << "\t|";
+            g++;
+        }
+        cout << "\n";
+    }
+    cout << line;*/
+
+}
+
+void PresentSolutionInkProblem::SolveN(int length, int n1, int n2)
+{
+    string s;
+
+
+    SolutionInkProblem sip(length);
+    sip.Sort();
+
+    for(int i = 0; i <= n2; i++)
+    {
+        sip.RandomlyComplicate();
+        s = sip.ToString();
+        if(i >= n1)
+            for(int j = 0; j < 6; j++)
+                AddSolution(s);
+    }
+
+    list<SolutionInkProblem*>::iterator g = GetBegin();
+    int i = 0;
+    for(; g != GetEnd(); g++)
+    {
+        LARGE_INTEGER nStartTime;
+        LARGE_INTEGER nStopTime;
+        LARGE_INTEGER nElapsed;
+        LARGE_INTEGER nFrequency;
+
+        ::QueryPerformanceFrequency(&nFrequency);
+        ::QueryPerformanceCounter(&nStartTime);
+
+        //steady_clock::time_point t1 = steady_clock::now();
+        //high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
+        (*g)->Solve(i%6 + 1,false);
+
+        ::QueryPerformanceCounter(&nStopTime);
+        nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
+        nElapsed.QuadPart /= nFrequency.QuadPart;
+
+        //steady_clock::time_point t2 = steady_clock::now();
+        //steady_clock::duration d = t2-t1;
+        //high_resolution_clock::time_point t2 = high_resolution_clock::now();
+        //cout << duration_cast<microseconds>(t).count() << endl;
+        //cout << duration_cast<microseconds>(d).count() << endl;
+        (*g)->SetDuration(nElapsed);
+
+        i++;
+    }
+
+    bprinter::TablePrinter tp(&std::cout,"|");
+    tp.AddColumn("Mode1", length);
+    tp.AddColumn("Mode1", length);
+    tp.AddColumn("Mode2", 5);
+    tp.AddColumn("Mode3", 5);
+    tp.AddColumn("Mode4", 10);
+
+    tp.PrintHeader();
+    i = 0;
+    for(g = GetBegin(); g != GetEnd(); g++)
+    {
+        //int64_t c =
+        tp << (*g)->GetShelfOnBegining() << (*g)->ToString() << (*g)->GetDistance() << (*g)->GetNumberOfShifts() << /*duration_cast<microseconds>(*/((*g)->GetDuration()).QuadPart /*).count()*/;
+        if(i%6 == 5)
+            tp.PrintFooter();
+        i++;
+    }
+    if(i%6 != 0)
+        tp << bprinter::endl();
+    tp.PrintFooter();
+
     /*
     i = 0;
     g = GetBegin();

@@ -29,6 +29,7 @@ SolutionInkProblem::SolutionInkProblem(int inks_numb)
     numberOfShifts = 0;
     start = shelf.length() - 4; // the arm of the machine start above last four bottles from the left
     pointer = start; // pointer starts on the forth on the end of the shelf from the left
+    shelfOnBegining = shelf.ToString();
 }
 
 SolutionInkProblem::SolutionInkProblem(string new_shelf)
@@ -38,6 +39,7 @@ SolutionInkProblem::SolutionInkProblem(string new_shelf)
     numberOfShifts = 0;
     start = shelf.length() - 4; // the arm of the machine start above last four bottles from the left
     pointer = start; // pointer starts on the forth on the end of the shelf from the left
+    shelfOnBegining = shelf.ToString();
 }
 
 std::list<int> SolutionInkProblem::BrutalPermutation(string sShelf, char notSorted, int deep)
@@ -671,10 +673,12 @@ int SolutionInkProblem::PointerRight()
 
 void SolutionInkProblem::Print()
 {
+    cout << shelfOnBegining << " -> ";
     cout << shelf;
     cout << "distance: " << distance + (int)abs(start-pointer) << "\nnumberOfShifts: " << numberOfShifts << endl;
-    cout << "transfers:\n";
-    cout << "Process duration:"<< duration_cast<nanoseconds>(duration).count() << " ns" << endl;
+    cout << "Process duration:" << duration.QuadPart;
+    cout << "\ntransfers:\n";
+    //cout << "Process duration:"<< duration_cast<nanoseconds>(duration).count() << " ns" << endl;
     for(list<int>::iterator i = transfers.begin(); i != transfers.end(); i++)
         cout << length() - (*i) << " ";
     cout << endl;
@@ -826,6 +830,49 @@ void SolutionInkProblem::PrintForPlay()
             cout << " ";
     }
     cout << "\ndistance: " << distance + (int)abs(start-pointer) << "\nnumberOfShifts: " << numberOfShifts << endl;
+}
+
+bool SolutionInkProblem::RandomlyComplicate()
+{
+    Ink ink1(ToString()[length()-1]);
+    Ink ink2(ToString()[length()-4]);
+
+    string sShelf = "";
+    for(int i = 0; i < 4; i++)
+        sShelf += ToString()[length() - 4 + i];
+
+    Shelf shelfTmp(sShelf);
+
+    bool isBackSorted = shelfTmp.Check();
+
+    char notSorted = 'C';
+    int i = 0;
+    int finded;
+    char actualInkType;
+    sShelf = ToString();
+    while(i < length())
+    {
+        actualInkType = sShelf[i];
+
+        if(actualInkType != notSorted)
+        {
+            finded = shelf.FindInkFrom(i, notSorted);
+            if(finded == i)
+            {
+                NextToSort(notSorted);
+                    if(notSorted == '0')
+                        break;
+                continue;
+            }
+        }
+        if(ink2 != i || !isBackSorted)
+        {
+            shelf.ReversMove4InksBottles(i);
+            return true;;
+        }
+        i++;
+    }
+    return false;
 }
 
 list<int> SolutionInkProblem::ScaleTransfersFrom6(string transfersFor6)
