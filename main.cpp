@@ -29,12 +29,13 @@ int main()
 
         if(s == "help")
             cout << "\tThe program sorting ink bottles.\n" <<
-                "\t\ttest\ttesting program\n" <<
-                "\t\tstring with only 'C', 'M', 'Y' and 'K' - solve given shelf (ex. solveInkProblem CCMYCK)\n" <<
-                "\t\tfile \"fileName.txt\" - solve every shelf infile with given name (ex. file = \"CYKCYM\\nYKCYK\\nKYMKNY...\")\n" <<
-                "\t\tnumb - generate randomly shelf with given length and solve it\n" <<
-                "\t\thelp - this text\n" <<
-                "\t\texit - close program\n" << endl;
+			"\t\ttest\ttesting program\n" <<
+			"\t\tstring with only 'C', 'M', 'Y' and 'K' - solve given shelf (ex. solveInkProblem CCMYCK)\n" <<
+			"\t\tfile \"fileName.txt\" - solve every shelf infile with given name (ex. file = \"CYKCYM\\nYKCYK\\nKYMKNY...\")\n" <<
+			"\t\tnumb - generate randomly shelf with given length and solve it\n" <<
+			"\t\t<n1,n2> - solve shelves with lengths from n1 to n2\m" <<
+			"\t\thelp - this text\n" <<
+			"\t\texit - close program\n";
         else if(s == "exit")
             return 0;
         else if(s == "test")

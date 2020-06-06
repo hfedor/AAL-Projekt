@@ -391,8 +391,6 @@ bool Tests::PresentSolutionInkProblemTest()
         PresentSolutionInkProblem psip("every7.txt");
 
         psip.Solve(1,false);
-
-
     }
     catch(exceptionData exc)
     {

@@ -676,9 +676,12 @@ void SolutionInkProblem::Print()
     cout << shelfOnBegining << " -> ";
     cout << shelf;
     cout << "distance: " << distance + (int)abs(start-pointer) << "\nnumberOfShifts: " << numberOfShifts << endl;
-    cout << "Process duration:" << duration.QuadPart;
+#ifdef __WIN32__
+	cout << "Process duration:" << duration.QuadPart;
+#else
+    cout << "Process duration:"<< duration_cast<nanoseconds>(duration).count() << " ns" << endl;
+#endif
     cout << "\ntransfers:\n";
-    //cout << "Process duration:"<< duration_cast<nanoseconds>(duration).count() << " ns" << endl;
     for(list<int>::iterator i = transfers.begin(); i != transfers.end(); i++)
         cout << length() - (*i) << " ";
     cout << endl;
@@ -955,12 +958,18 @@ bool SolutionInkProblem::Solve(int mode, bool animated)
                         SolveLast6Brutal(animated);
                         break;
                     case 4 :
-                        SolveLast6List(animated);
+                        SolveLast6Brutal(animated);
                         break;
                     case 5 :
                         SolveLast6List(animated);
                         break;
                     case 6 :
+                        SolveLast6List(animated);
+                        break;
+					case 7:
+                        SolveLast6List(animated);
+                        break;
+					case 8 :
                         SolveLast6List(animated);
                         break;
                     }
@@ -970,13 +979,13 @@ bool SolutionInkProblem::Solve(int mode, bool animated)
                 switch(mode)
                     {
                     case 1 :
-                        MoveBottleToPos(i, finded, animated);
-                        break;
-                    case 2 :
                         SolveBrtualBegining(i,notSorted,animated);
                         break;
-                    case 3 :
+                    case 2 :
                         SolveBrtualBeginingSparing('0',i, notSorted, animated);
+                        break;
+                    case 3 :
+                        MoveBottleToPos(i, finded, animated);
                         break;
                     case 4 :
                         SolveMod4(i, finded, '0', animated);
@@ -986,6 +995,12 @@ bool SolutionInkProblem::Solve(int mode, bool animated)
                         break;
                     case 6 :
                         SolveBrtualBeginingSparing('0',i, notSorted, animated);
+                        break;
+					case 7 :
+                        MoveBottleToPos(i, finded, animated);
+                        break;
+					case 8 :
+                        SolveMod4(i, finded, '0', animated);
                         break;
                     }
         }
@@ -1057,12 +1072,18 @@ bool SolutionInkProblem::Solve(char biggestInBegin, int mode, bool animated)
                         SolveLast6Brutal(animated);
                         break;
                     case 4 :
-                        SolveLast6List(animated);
+                        SolveLast6Brutal(animated);
                         break;
                     case 5 :
                         SolveLast6List(animated);
                         break;
                     case 6 :
+                        SolveLast6List(animated);
+                        break;
+					case 7:
+                        SolveLast6List(animated);
+                        break;
+					case 8 :
                         SolveLast6List(animated);
                         break;
                     }
@@ -1072,22 +1093,28 @@ bool SolutionInkProblem::Solve(char biggestInBegin, int mode, bool animated)
                 switch(mode)
                     {
                     case 1 :
-                        MoveBottleToPos(i, finded, animated);
-                        break;
-                    case 2 :
                         SolveBrtualBegining(i,notSorted,animated);
                         break;
+                    case 2 :
+                        SolveBrtualBeginingSparing('0',i, notSorted, animated);
+                        break;
                     case 3 :
-                        SolveBrtualBeginingSparing(biggestInBegin,i, notSorted, animated);
+                        MoveBottleToPos(i, finded, animated);
                         break;
                     case 4 :
-                        SolveMod4(i, finded, biggestInBegin, animated);
+                        SolveMod4(i, finded, '0', animated);
                         break;
                     case 5 :
                         SolveBrtualBegining(i,notSorted,animated);
                         break;
                     case 6 :
-                        SolveBrtualBeginingSparing(biggestInBegin,i, notSorted, animated);
+                        SolveBrtualBeginingSparing('0',i, notSorted, animated);
+                        break;
+					case 7 :
+                        MoveBottleToPos(i, finded, animated);
+                        break;
+					case 8 :
+                        SolveMod4(i, finded, '0', animated);
                         break;
                     }
         }

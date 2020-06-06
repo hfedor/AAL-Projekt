@@ -25,8 +25,11 @@ class SolutionInkProblem
         int numberOfShifts; // number of ink bottles transfers made by the chine
         int start; // position where the arm of the machine starts
         std::list<int> transfers; // list of ink bottles (firsts of them from the left) moved by the arm of the machine
-        //std::chrono::steady_clock::duration duration;
+#ifdef __WIN32__
         LARGE_INTEGER duration;
+#else
+		std::chrono::steady_clock::duration duration;
+#endif
         std::string shelfOnBegining;
     public:
         SolutionInkProblem(int inksNumb); // constructor with given number of ink bottles on the constructed shelf
@@ -45,8 +48,11 @@ class SolutionInkProblem
         std::list<int> GetTransfers(){return transfers;}
         std::string GetTransfersByString();
         int GetDistance(){return distance;}
-        //std::chrono::steady_clock::duration GetDuration(){return duration;}
+#ifdef __WIN32__
         LARGE_INTEGER GetDuration(){return duration;}
+#else
+        std::chrono::steady_clock::duration GetDuration(){return duration;}
+#endif
         int GetNumberOfShifts(){return numberOfShifts;}
         int GetPointer(){return pointer;}
         int GetStart(){return start = shelf.length() - 4;}
@@ -70,8 +76,11 @@ class SolutionInkProblem
         bool RandomlyComplicate();
         void SaveToFile(std::fstream f);
         std::list<int> ScaleTransfersFrom6(std::string transfersFor6);
-        //void SetDuration(std::chrono::steady_clock::duration d){duration = d;}
+#ifdef __WIN32__
         void SetDuration(LARGE_INTEGER d){duration = d;}
+#else
+        void SetDuration(std::chrono::steady_clock::duration d){duration = d;}
+#endif
         void SleepASecond(int);
         bool Solve(int mode, bool animated);
         bool Solve(char biggestInBegin, int mode, bool animated);
@@ -79,7 +88,7 @@ class SolutionInkProblem
         bool SolveBrtualBegining(int actPos, char notSorted, bool animated);
         bool SolveBrtualBeginingSparing(char biggestInBegin, int j, char notSorted, bool animated);
         bool SolveBrtualBeginingSparing2(int actPos, char notSorted, bool animated);
-        bool SolveMod4(int actPos, int moved, char biggestInBegin, bool animated);
+		bool SolveMod4(int actPos, int moved, char biggestInBegin, bool animated);
         bool SolveLast6Brutal(bool animated);
         bool SolveLast6Brutal(bool animated, int firsts);
         bool SolveLast6List(bool animated);
