@@ -233,21 +233,24 @@ bool Tests::SolutionInkProblemTest()
         //if(!(sip4.ScaleTransfersFrom6("01234") == "23456"))
             //throw PreperExceptionData("SolutionInkProblem","ScaleTransfersFrom6","Transfer was not scaled properly!");
 
-        sip2 = sip4;
-        if(!sip4.Solve(1,false))
-	    throw PreperExceptionData("SolutionInkProblem","Solve","Can not solve!");
+		for(int i = 1; i <= 8; i++)
+		{
+			sip2 = sip4;
+			if(!sip4.Solve(1,false))
+			throw PreperExceptionData("SolutionInkProblem","Solve","Can not solve!");
 
-        if(!(sip4.ToString() == sip2.GetShelf().Sort()))
-        {
-            string className = "SolutionInkProblem";
-            string functionName = "Solve";
-            string message = "Bottles were transported not properly!\nresult:\t\t";
-            message += sip4.ToString();
-            message +=  "\nexpected:\t";
-            message += sip2.GetShelf().Sort();
-            throw PreperExceptionData(className,functionName,message);
-            throw PreperExceptionData(className,functionName,message);
-        }
+			if(!(sip4.ToString() == sip2.GetShelf().Sort()))
+			{
+				string className = "SolutionInkProblem";
+				string functionName = "Solve";
+				string message = "Bottles were transported not properly!\nresult:\t\t";
+				message += sip4.ToString();
+				message +=  "\nexpected:\t";
+				message += sip2.GetShelf().Sort();
+				throw PreperExceptionData(className,functionName,message);
+				throw PreperExceptionData(className,functionName,message);
+			}
+		}
     }
     catch(exceptionData exc)
     {
@@ -270,7 +273,7 @@ void Tests::SIPTMove(SolutionInkProblem* sip,string transfers,string shelfResult
     sip->Move(transfersList,false);
     if(!(sip->GetShelf() == shelfResult))
     {
-        string message = "Bottles were transported not properly!\nresult:\t\t";
+        string message = "3Bottles were transported not properly!\nresult:\t\t";
         message += sip->GetShelf().ToString();
         message +=  "\nexpected:\t";
         message += shelfResult;
@@ -310,7 +313,7 @@ void Tests::SIPTMove4InksBottles(SolutionInkProblem* sip,int transfer,string she
     sip->Move4InksBottles(transfer,false);
     if(!(sip->GetShelf() == shelfResult))
     {
-        string message = "Bottles were transported not properly!\nresult:\t\t";
+        string message = "2Bottles were transported not properly!\nresult:\t\t";
         message += sip->GetShelf().ToString();
         message +=  "\nexpected:\t";
         message += shelfResult;
@@ -364,7 +367,7 @@ void Tests::SIPTMoveBottleToPos(SolutionInkProblem* sip,int actPos,int bottleToB
     for(int i = 0; i <= actPos; i++)
         if(!(sip->ToString()[i] == result[i]))
         {
-            string message = "Bottles were transported not properly!\nactual position:\t";
+            string message = "1Bottles were transported not properly!\nactual position:\t";
             message += to_string(actPos);
             message +=  "\tbottle to be moved:\t";
             message += to_string(bottleToBeMoved);

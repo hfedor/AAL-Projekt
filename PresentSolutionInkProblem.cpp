@@ -191,6 +191,10 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
     Shelf shelfTmp1(n1 - 1);
 
     s = shelfTmp1.ToString();
+	
+	int mediana = (n2-n1+2)/2;
+	SolutionInkProblem *tmp;
+	vector<SolutionInkProblem*> mediana_solution;
 
     srand(time(NULL));
 
@@ -238,18 +242,21 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
                 iter = s.length() - 1;
         }
 
-
         s = stmp1;
 
         SolutionInkProblem sip(s);
-        for(int j = 0; j < 8; j++)
-            AddSolution(s);
+        for(int j = 0; j < 8; j++){
+            tmp = AddSolution(s);
+		}
     }
 
     list<SolutionInkProblem*>::iterator g = GetBegin();
     int i = 0;
+	int n = 0;
     for(; g != GetEnd(); g++)
     {
+			if(i%8 == 0)
+				n++;
 #ifdef __WIN32__
         LARGE_INTEGER nStartTime;
         LARGE_INTEGER nStopTime;
@@ -263,6 +270,10 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 #endif
 
         (*g)->Solve(i%8 + 1,false);
+		
+		
+		if(n == mediana)
+			mediana_solution.push_back(*	g);
 
 #ifdef __WIN32__
         ::QueryPerformanceCounter(&nStopTime);
@@ -287,15 +298,27 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
     tp.AddColumn("distance", 8);
     tp.AddColumn("shifts", 8);
     tp.AddColumn("duration", 10);
+    tp.AddColumn("teoretical cost", 15);
 
     tp.PrintHeader();
     i = 0;
     for(g = GetBegin(); g != GetEnd(); g++)
     {        
+		float q = 0;
+		string sShelf = (*g)->ToString();
+		if((*g)->GetTooSlow())
+			sShelf = "It was to slow...";
 #ifdef __WIN32__
-		tp << (*g)->GetShelfOnBegining().length() << (*g)->GetShelfOnBegining() << (*g)->ToString() << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<((*g)->GetDuration()).QuadPart ;
+		//q = ((*g)->GetDuration()).QuadPart *  (*mediana_solution).GetTeoreticalCost() /(((*mediana_solution).GetDuration()) *(*g)->GetTeoreticalCost() );
+		tp << (*g)->GetShelfOnBegining().length() << (*g)->GetShelfOnBegining() <<  sShelf << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<((*g)->GetDuration()).QuadPart << q ;
 #else
-		tp << (*g)->GetShelfOnBegining().length() << (*g)->GetShelfOnBegining() << (*g)->ToString() << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<duration_cast<microseconds>((*g)->GetDuration()).count();
+		if(!mediana_solution.empty())
+			if(mediana_solution[i%8] != NULL)
+				q = (float)((*g)->GetDuration()).count() *  (float)(*mediana_solution[i%8]).GetTeoreticalCost() /((float)((*mediana_solution[i%8]).GetDuration()).count() *(float)(*g)->GetTeoreticalCost() );
+			else q = -2;
+		else
+			q = -1;
+		tp << (*g)->GetShelfOnBegining().length() << (*g)->GetShelfOnBegining() << sShelf << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<duration_cast<microseconds>((*g)->GetDuration()).count() << q;
 #endif
 		if(i%8 == 7)
             tp.PrintFooter();
