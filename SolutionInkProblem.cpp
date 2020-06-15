@@ -142,7 +142,7 @@ std::list<int> SolutionInkProblem::BrutalPermutationSparing(char biggestInBegin,
                     if(do_last_6 || j < ((int)sShelf2.length()) - 6)
                     {
                         SolutionInkProblem sip(sShelf2);
-                        sip.Solve(biggestInBegin,3,false);
+                        sip.Solve(biggestInBegin,4,false);
 						if(sip.transfers.front() == -2)
 						{
 							too_slow = true;
@@ -321,12 +321,11 @@ int SolutionInkProblem::CountCostBeginingBrutal(int l)
 	if(l < 5)
 		return 0;
 	int result = 0;
-	for(int j = 5; j <= l; j++)
+	for(int j = l; j >= 5; j--)
 	{
 		for(int i = 1; i <= 3; i++)
 		{
-			int tmp = pow(j-4,i);
-			tmp *= j;
+			int tmp = pow(j,i+1);
 			result += tmp;
 		}
 	}
@@ -342,8 +341,7 @@ int SolutionInkProblem::CountCostBeginingBrutalSparing(int l)
 	{
 		for(int i = 1; i <= 3; i++)
 		{
-			int tmp = pow(j-4,i);
-			tmp *= j;
+			int tmp = pow(j,i+1);
 			tmp += CountCostBeginingBrutalSparing(l-4);
 			result += tmp;
 		}
@@ -382,26 +380,29 @@ int SolutionInkProblem::CountCost(int mode)
 	if(mode > 4)
 		result = CountCostLast6Brutal();
 	else
-		result = 4012;
+		result = 24072;
 	
-	int tmp;
-	switch(mode)
+	if(length() > 6)
 	{
-		case 1:
-			tmp = CountCostBeginingBrutal(length());
-			break;
-		case 2:
-			tmp = CountCostBeginingBrutalSparing(length());
-			break;
-		case 3:
-			tmp = CountCostMod4(length());
-			break;
-		case 4:
-			tmp = CountCostMod4Recurent(length());
-			break;
+		int tmp;
+		switch(mode)
+		{
+			case 1:
+				tmp = CountCostBeginingBrutal(length());
+				break;
+			case 2:
+				tmp = CountCostBeginingBrutalSparing(length());
+				break;
+			case 3:
+				tmp = CountCostMod4(length());
+				break;
+			case 4:
+				tmp = CountCostMod4Recurent(length());
+				break;
+		}
+		if(tmp > result)
+			result = tmp;
 	}
-	if(tmp > result)
-		result = tmp;
 	teoretical_cost = result;
 	return result;
 }

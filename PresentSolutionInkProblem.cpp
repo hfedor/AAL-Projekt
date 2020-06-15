@@ -321,6 +321,7 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 
     bprinter::TablePrinter tp(&std::cout,"|");
     tp.AddColumn("n", 4);
+    tp.AddColumn("Last6/Begining", 15);
     tp.AddColumn("Shelf befor soritng", max(n2,20));
     tp.AddColumn("Shelf after soritng", max(n2,20));
     tp.AddColumn("distance", 8);
@@ -336,9 +337,38 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 		string sShelf = (*g)->ToString();
 		if((*g)->GetTooSlow())
 			sShelf = "It was to slow...";
+		
+		string mode;
+		switch(i%8)
+		{
+			case 0:
+				mode = "List  /  Brutal";
+				break;
+			case 1:
+				mode = "List  / BrutRec";
+				break;
+			case 2:
+				mode = "List  /    Mod4";
+				break;
+			case 3:
+				mode = "List  / Mod4Rec";
+				break;
+			case 4:
+				mode = "Brut  /  Brutal";
+				break;
+			case 5:
+				mode = "Brut  / BrutRec";
+				break;
+			case 6:
+				mode = "Brut  /    Mod4";
+				break;
+			case 7:
+				mode = "Brut  / Mod4Rec";
+				break;
+		}
 #ifdef __WIN32__
 		//q = ((*g)->GetDuration()).QuadPart *  (*mediana_solution).GetTeoreticalCost() /(((*mediana_solution).GetDuration()) *(*g)->GetTeoreticalCost() );
-		tp << (*g)->GetShelfOnBegining().length() << (*g)->GetShelfOnBegining() <<  sShelf << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<((*g)->GetDuration()).QuadPart << q ;
+		tp << (*g)->GetShelfOnBegining().length() << mode << (*g)->GetShelfOnBegining() <<  sShelf << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<((*g)->GetDuration()).QuadPart << q ;
 #else
 		if(!mediana_solution.empty())
 			if(mediana_solution[i%8] != NULL)
@@ -346,7 +376,7 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 			else q = -2;
 		else
 			q = -1;
-		tp << (*g)->GetShelfOnBegining().length() << (*g)->GetShelfOnBegining() << sShelf << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<duration_cast<microseconds>((*g)->GetDuration()).count() << q;
+		tp << (*g)->GetShelfOnBegining().length() << mode << (*g)->GetShelfOnBegining() << sShelf << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<duration_cast<microseconds>((*g)->GetDuration()).count() << q;
 #endif
 		if(i%8 == 7)
             tp.PrintFooter();
@@ -624,7 +654,7 @@ void StartProgram(int argNumb, char **arguments)
 				
 				int n1 =atoi(arguments[2]), n2 = atoi(arguments[3]);
 					
-				if(range && n2 > n1)
+				if(range && n2 < n1)
 				{
 					range = false;
 					cout << "n1(" << n1 << ") > n2(" << n2 << ")!" << endl;
