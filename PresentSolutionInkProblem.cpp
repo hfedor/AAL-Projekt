@@ -191,6 +191,16 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
     Shelf shelfTmp1(n1 - 1);
 
     s = shelfTmp1.ToString();
+	
+	int mediana = (n2-n1+2)/2;
+	SolutionInkProblem *tmp;
+	vector<SolutionInkProblem*> mediana_solution;
+	
+	bool count[8];
+	for(int i = 0; i < 8; i++)
+	{
+		count[i] = true;
+	}
 
     srand(time(NULL));
 
@@ -238,18 +248,21 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
                 iter = s.length() - 1;
         }
 
-
         s = stmp1;
 
         SolutionInkProblem sip(s);
-        for(int j = 0; j < 8; j++)
-            AddSolution(s);
+        for(int j = 0; j < 8; j++){
+            tmp = AddSolution(s);
+		}
     }
 
     list<SolutionInkProblem*>::iterator g = GetBegin();
     int i = 0;
+	int n = 0;
     for(; g != GetEnd(); g++)
     {
+			if(i%8 == 0)
+				n++;
 #ifdef __WIN32__
         LARGE_INTEGER nStartTime;
         LARGE_INTEGER nStopTime;
@@ -262,7 +275,20 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
         steady_clock::time_point t1 = steady_clock::now();
 #endif
 
-        (*g)->Solve(i%8 + 1,false);
+		if(count[i%8])
+		{
+			try
+			{
+				(*g)->Solve(i%8 + 1,false);
+			}
+			catch (string err)
+			{
+				cout << err << endl;
+				count[i%8] = false;
+			}
+		}
+		else
+			(*g)->SetTooSlow(true);
 
 #ifdef __WIN32__
         ::QueryPerformanceCounter(&nStopTime);
@@ -277,25 +303,80 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 		(*g)->SetDuration(d);
 #endif
 
+		if(count[i%8])
+		{
+			if(n <= mediana)
+			{
+				if(mediana_solution.size() < 8)
+					mediana_solution.push_back(*	g);
+				else
+					mediana_solution[i%8] = (*g);
+			}
+			
+			(*g)->CountCost(i%8);
+		}
+
         i++;
     }
 
     bprinter::TablePrinter tp(&std::cout,"|");
     tp.AddColumn("n", 4);
+    tp.AddColumn("Last6/Begining", 15);
     tp.AddColumn("Shelf befor soritng", max(n2,20));
     tp.AddColumn("Shelf after soritng", max(n2,20));
     tp.AddColumn("distance", 8);
     tp.AddColumn("shifts", 8);
     tp.AddColumn("duration", 10);
+    tp.AddColumn("teoretical cost", 15);
 
     tp.PrintHeader();
     i = 0;
     for(g = GetBegin(); g != GetEnd(); g++)
     {        
+		float q = 0;
+		string sShelf = (*g)->ToString();
+		if((*g)->GetTooSlow())
+			sShelf = "It was to slow...";
+		
+		string mode;
+		switch(i%8)
+		{
+			case 0:
+				mode = "Brut  /  Brutal";
+				break;
+			case 1:
+				mode = "Brut  / BrutRec";
+				break;
+			case 2:
+				mode = "Brut  /    Mod4";
+				break;
+			case 3:
+				mode = "Brut  / Mod4Rec";
+				break;
+			case 4:
+				mode = "List  /  Brutal";
+				break;
+			case 5:
+				mode = "List  / BrutRec";
+				break;
+			case 6:
+				mode = "List  /    Mod4";
+				break;
+			case 7:
+				mode = "List  / Mod4Rec";
+				break;
+		}
 #ifdef __WIN32__
-		tp << (*g)->GetShelfOnBegining().length() << (*g)->GetShelfOnBegining() << (*g)->ToString() << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<((*g)->GetDuration()).QuadPart ;
+		//q = ((*g)->GetDuration()).QuadPart *  (*mediana_solution).GetTeoreticalCost() /(((*mediana_solution).GetDuration()) *(*g)->GetTeoreticalCost() );
+		tp << (*g)->GetShelfOnBegining().length() << mode << (*g)->GetShelfOnBegining() <<  sShelf << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<((*g)->GetDuration()).QuadPart << q ;
 #else
-		tp << (*g)->GetShelfOnBegining().length() << (*g)->GetShelfOnBegining() << (*g)->ToString() << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<duration_cast<microseconds>((*g)->GetDuration()).count();
+		if(!mediana_solution.empty())
+			if(mediana_solution[i%8] != NULL)
+				q = (float)((*g)->GetDuration()).count() *  (float)(*mediana_solution[i%8]).GetTeoreticalCost() /((float)((*mediana_solution[i%8]).GetDuration()).count() *(float)(*g)->GetTeoreticalCost() );
+			else q = -2;
+		else
+			q = -1;
+		tp << (*g)->GetShelfOnBegining().length() << mode << (*g)->GetShelfOnBegining() << sShelf << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<duration_cast<microseconds>((*g)->GetDuration()).count() << q;
 #endif
 		if(i%8 == 7)
             tp.PrintFooter();
@@ -573,7 +654,7 @@ void StartProgram(int argNumb, char **arguments)
 				
 				int n1 =atoi(arguments[2]), n2 = atoi(arguments[3]);
 					
-				if(range && n2 > n1)
+				if(range && n2 < n1)
 				{
 					range = false;
 					cout << "n1(" << n1 << ") > n2(" << n2 << ")!" << endl;

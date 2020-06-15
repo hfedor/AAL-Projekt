@@ -2,6 +2,7 @@
 #define PRESENTSOLUTIONINKPROBLEM_HPP
 
 #include <list>
+#include <vector>
 #include "SolutionInkProblem.hpp"
 
 /*
