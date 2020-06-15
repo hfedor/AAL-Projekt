@@ -15,6 +15,8 @@
 
 #endif
 
+const long TIME_LIMIT = 50000000000;
+
 /*
     Class for solving problem of sorting ink bottles by the machine described in the task.
 */
@@ -52,8 +54,11 @@ class SolutionInkProblem
         void ClearTerminal();
 		int CountCostLast6Brutal();
         int CountCostLast6List();
-        int CountCostBeginingBrutal(int l, int d);
-        int CountCostBeginingBrutalSparing(int l, int d);
+        int CountCostBeginingBrutal(int l);
+        int CountCostBeginingBrutalSparing(int l);
+        int CountCostMod4(int l);
+        int CountCostMod4Recurent(int l);
+		int CountCost(int mode);
         std::list<Ink>::iterator FindByNumber(int numb); // return Ink bottle by the number from the left
         std::list<int> GetTransfers(){return transfers;}
         std::string GetTransfersByString();
@@ -93,14 +98,14 @@ class SolutionInkProblem
 #else
         void SetDuration(std::chrono::steady_clock::duration d){duration = d;}
 #endif
+		void SetTooSlow(bool t){too_slow = t;}
         void SleepASecond(int);
         int Solve(int mode, bool animated);
         int Solve(char biggestInBegin, int mode, bool animated);
         int SolveBrutal(bool animated);
         int SolveBrtualBegining(int actPos, char notSorted, bool animated);
         int SolveBrtualBeginingSparing(char biggestInBegin, int j, char notSorted, bool animated);
-        int SolveBrtualBeginingSparing2(int actPos, char notSorted, bool animated);
-		int SolveMod4(int actPos, int moved, char biggestInBegin, bool animated);
+        int SolveMod4(int actPos, int moved, char biggestInBegin, bool animated);
         int SolveLast6Brutal(bool animated);
         int SolveLast6Brutal(bool animated, int firsts);
         int SolveLast6List(bool animated);

@@ -76,17 +76,18 @@ std::list<int> SolutionInkProblem::BrutalPermutation(string sShelf, char notSort
        if((nElapsed).QuadPart > 500)
 		   return list<int>{-2};
 #else
-         steady_clock::time_point t2 = steady_clock::now();
-        steady_clock::duration d = t2-start_time;
-		
-		 if((d).count() > 500000)
-		 {
+        steady_clock::time_point t2 = steady_clock::now();
+        duration = t2-start_time;
+		if((duration).count() > TIME_LIMIT)
+		{
+			cout << (duration).count() << endl;
 			too_slow = true;
+			throw to_string((duration).count());
 			return list<int>{-2};
-		 }
+		}
 #endif
 		
-        for(int i = 0; i <  7; i++)
+        for(int i = 0; i <  sShelf.length(); i++)
         {
             Shelf permutedSfelf(sShelf);
 
@@ -177,7 +178,28 @@ std::list<int> SolutionInkProblem::BrutalPermutationSparing(char biggestInBegin,
     }
     else
     {
-        for(int i = 0; i < length() - 4; i++)
+		#ifdef __WIN32__
+        LARGE_INTEGER nStopTime;
+        LARGE_INTEGER nElapsed;
+        LARGE_INTEGER nFrequency;
+        ::QueryPerformanceCounter(&nStopTime);
+        nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
+        nElapsed.QuadPart /= nFrequency.QuadPart;
+
+       if((nElapsed).QuadPart > 500)
+		   return list<int>{-2};
+#else
+        steady_clock::time_point t2 = steady_clock::now();
+        duration = t2-start_time;
+		if((duration).count() > TIME_LIMIT)
+		{
+			cout << (duration).count() << endl;
+			too_slow = true;
+			throw to_string((duration).count());
+			return list<int>{-2};
+		}
+#endif
+        for(int i = 0; i < sShelf.length(); i++)
         {
             Shelf permutedSfelf(sShelf);
 
@@ -294,36 +316,93 @@ int SolutionInkProblem::CountCostLast6Brutal()
 	return result;
 }
 
-int SolutionInkProblem::CountCostBeginingBrutal(int l, int d)
+int SolutionInkProblem::CountCostBeginingBrutal(int l)
 {
 	if(l < 5)
 		return 0;
 	int result = 0;
 	for(int j = 5; j <= l; j++)
 	{
-		for(int i = 1; i < d; i++)
+		for(int i = 1; i <= 3; i++)
 		{
 			int tmp = pow(j-4,i);
+			tmp *= j;
 			result += tmp;
 		}
 	}
 	return result;
 }
 
-int SolutionInkProblem::CountCostBeginingBrutalSparing(int l,int d)
+int SolutionInkProblem::CountCostBeginingBrutalSparing(int l)
 {
 	if(l < 5)
 		return 0;
 	int result = 0;
 	for(int j = 5; j <= l; j++)
 	{
-		for(int i = 1; i < d; i++)
+		for(int i = 1; i <= 3; i++)
 		{
 			int tmp = pow(j-4,i);
+			tmp *= j;
+			tmp += CountCostBeginingBrutalSparing(l-4);
 			result += tmp;
-			
 		}
 	}
+	return result;
+}
+
+int SolutionInkProblem::CountCostMod4(int l)
+{
+	if(l < 5)
+		return 0;
+	int result = 0;
+	for(int j = 1; j <= l; j++)
+	{
+		result += j;
+	}
+	return result;
+}
+
+int SolutionInkProblem::CountCostMod4Recurent(int l)
+{
+	if(l < 5)
+		return 0;
+	int result = 0;
+	for(int j = 1; j <= l; j++)
+	{
+		result += j;
+		result += CountCostMod4Recurent(l - 4);
+	}
+	return result;
+}
+
+int SolutionInkProblem::CountCost(int mode)
+{
+	int result = 0;
+	if(mode > 4)
+		result = CountCostLast6Brutal();
+	else
+		result = 4012;
+	
+	int tmp;
+	switch(mode)
+	{
+		case 1:
+			tmp = CountCostBeginingBrutal(length());
+			break;
+		case 2:
+			tmp = CountCostBeginingBrutalSparing(length());
+			break;
+		case 3:
+			tmp = CountCostMod4(length());
+			break;
+		case 4:
+			tmp = CountCostMod4Recurent(length());
+			break;
+	}
+	if(tmp > result)
+		result = tmp;
+	teoretical_cost = result;
 	return result;
 }
 
@@ -471,9 +550,29 @@ int SolutionInkProblem::MoveBottleToPos(int actPos, int bottleToBeMoved, bool an
     if(actPos > bottleToBeMoved)
         return -1;
 
-
     while(actPos != bottleToBeMoved)
     {
+#ifdef __WIN32__
+        LARGE_INTEGER nStopTime;
+        LARGE_INTEGER nElapsed;
+        LARGE_INTEGER nFrequency;
+        ::QueryPerformanceCounter(&nStopTime);
+        nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
+        nElapsed.QuadPart /= nFrequency.QuadPart;
+
+       if((nElapsed).QuadPart > 500)
+		   return list<int>{-2};
+#else
+        steady_clock::time_point t2 = steady_clock::now();
+        duration = t2-start_time;
+		if((duration).count() > TIME_LIMIT)
+		{
+			cout << (duration).count() << endl;
+			too_slow = true;
+			throw to_string((duration).count());
+		}
+#endif
+
         distance = bottleToBeMoved - actPos;
 
         if(distance%4 == 0)
@@ -1120,13 +1219,11 @@ int SolutionInkProblem::SolveBrtualBegining(int j, char notSorted, bool animated
     for(;transforamtions.front() == -1; deep++){
         transforamtions = BrutalPermutation(ShelfEnding,notSorted,deep);
 		if(transforamtions.front() == -2)
+		{
 			too_slow = true;
 			return -2;
+		}
 	}
-	
-	int tmp = CountCostBeginingBrutal(length(), deep);
-	if(teoretical_cost < tmp)
-		teoretical_cost = tmp;
 	
     if(transforamtions.front() != -1)
     {
@@ -1152,8 +1249,10 @@ int SolutionInkProblem::SolveBrtualBeginingSparing(char biggestInBegin, int j, c
     for(int deep = 0;transforamtions.front() == -1; deep++){
         transforamtions = BrutalPermutationSparing(biggestInBegin, ShelfEnding,notSorted,deep);
 		if(transforamtions.front() == -2)
+		{
 			too_slow = true;
 			return -2;
+		}
 	}
 
     if(transforamtions.front() != -1)
@@ -1169,10 +1268,6 @@ int SolutionInkProblem::SolveLast6Brutal(bool animated)
 {
     string ShelfEnding = "";
     string sShelf = ToString();
-	
-	int tmp = CountCostLast6Brutal();
-	if(teoretical_cost < tmp)
-		teoretical_cost = tmp;
 
     for(int i = length() - 6; i < length(); i++)
         ShelfEnding += sShelf[i];
@@ -1223,9 +1318,6 @@ int SolutionInkProblem::SolveLast6List(bool animated)
 {
     string ShelfEnding = "";
     string sShelf = ToString();
-
-	if(teoretical_cost < 4012)
-		teoretical_cost = 4012;
 	
     for(int i = length() - 6; i < length(); i++)
         ShelfEnding += sShelf[i];
@@ -1258,9 +1350,29 @@ int SolutionInkProblem::SolveMod4(int actPos, int bottleToBeMoved, char biggestI
     if(actPos > bottleToBeMoved)
         return -1;
 
-
     while(actPos != bottleToBeMoved)
     {
+#ifdef __WIN32__
+        LARGE_INTEGER nStopTime;
+        LARGE_INTEGER nElapsed;
+        LARGE_INTEGER nFrequency;
+        ::QueryPerformanceCounter(&nStopTime);
+        nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
+        nElapsed.QuadPart /= nFrequency.QuadPart;
+
+       if((nElapsed).QuadPart > 500)
+		   return list<int>{-2};
+#else
+        steady_clock::time_point t2 = steady_clock::now();
+        duration = t2-start_time;
+		if((duration).count() > TIME_LIMIT)
+		{
+			cout << (duration).count() << endl;
+			too_slow = true;
+			throw to_string((duration).count());
+		}
+#endif
+
         permutationShelf = shelf;
         distance = bottleToBeMoved - actPos;
 

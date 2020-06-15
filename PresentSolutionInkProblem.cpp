@@ -195,6 +195,12 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 	int mediana = (n2-n1+2)/2;
 	SolutionInkProblem *tmp;
 	vector<SolutionInkProblem*> mediana_solution;
+	
+	bool count[8];
+	for(int i = 0; i < 8; i++)
+	{
+		count[i] = true;
+	}
 
     srand(time(NULL));
 
@@ -269,11 +275,20 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
         steady_clock::time_point t1 = steady_clock::now();
 #endif
 
-        (*g)->Solve(i%8 + 1,false);
-		
-		
-		if(n == mediana)
-			mediana_solution.push_back(*	g);
+		if(count[i%8])
+		{
+			try
+			{
+				(*g)->Solve(i%8 + 1,false);
+			}
+			catch (string err)
+			{
+				cout << err << endl;
+				count[i%8] = false;
+			}
+		}
+		else
+			(*g)->SetTooSlow(true);
 
 #ifdef __WIN32__
         ::QueryPerformanceCounter(&nStopTime);
@@ -287,6 +302,19 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 		
 		(*g)->SetDuration(d);
 #endif
+
+		if(count[i%8])
+		{
+			if(n <= mediana)
+			{
+				if(mediana_solution.size() < 8)
+					mediana_solution.push_back(*	g);
+				else
+					mediana_solution[i%8] = (*g);
+			}
+			
+			(*g)->CountCost(i%8);
+		}
 
         i++;
     }
