@@ -191,11 +191,11 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
     Shelf shelfTmp1(n1 - 1);
 
     s = shelfTmp1.ToString();
-	
+
 	int mediana = (n2-n1+2)/2;
 	SolutionInkProblem *tmp;
 	vector<SolutionInkProblem*> mediana_solution;
-	
+
 	bool count[8];
 	for(int i = 0; i < 8; i++)
 	{
@@ -299,7 +299,7 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 #else
          steady_clock::time_point t2 = steady_clock::now();
         steady_clock::duration d = t2-t1;
-		
+
 		(*g)->SetDuration(d);
 #endif
 
@@ -312,7 +312,7 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 				else
 					mediana_solution[i%8] = (*g);
 			}
-			
+
 			(*g)->CountCost(i%8);
 		}
 
@@ -332,12 +332,12 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
     tp.PrintHeader();
     i = 0;
     for(g = GetBegin(); g != GetEnd(); g++)
-    {        
+    {
 		float q = 0;
 		string sShelf = (*g)->ToString();
 		if((*g)->GetTooSlow())
 			sShelf = "It was to slow...";
-		
+
 		string mode;
 		switch(i%8)
 		{
@@ -367,7 +367,15 @@ void PresentSolutionInkProblem::SolveN(int n1, int n2)
 				break;
 		}
 #ifdef __WIN32__
-		//q = ((*g)->GetDuration()).QuadPart *  (*mediana_solution).GetTeoreticalCost() /(((*mediana_solution).GetDuration()) *(*g)->GetTeoreticalCost() );
+		if(!mediana_solution.empty())
+			if(mediana_solution[i%8] != NULL)
+			{
+                q = (float)((*g)->GetDuration()).QuadPart;
+				q *=  (float)((*mediana_solution[i%8]).GetTeoreticalCost());
+				q /= (float)((*mediana_solution[i%8]).GetDuration().QuadPart);
+				q /= (float)((*g)->GetTeoreticalCost());
+			}
+			else q = -2;
 		tp << (*g)->GetShelfOnBegining().length() << mode << (*g)->GetShelfOnBegining() <<  sShelf << (*g)->GetDistance() << (*g)->GetNumberOfShifts() <<((*g)->GetDuration()).QuadPart << q ;
 #else
 		if(!mediana_solution.empty())
@@ -504,7 +512,7 @@ void StartProgram(int argNumb, char **arguments)
 		    Tests t;
 		    t.testAll();
 		}
-		
+
 		bool shelf = true;
 		for(int i = 0; i < args.length(); i++)
 		{
@@ -609,16 +617,16 @@ void StartProgram(int argNumb, char **arguments)
 			}
 		}
 
-		cout << "Wrong arguments!" << endl;	
-	}	
+		cout << "Wrong arguments!" << endl;
+	}
 	else if(argNumb == 4)
 	{
 		string args = arguments[1];
-		
+
 		if(args == "n")
 		{
 			bool range = true;
-			
+
 			args = arguments[2];
 
 			if(args[0] < '1' || args[0] > '9')
@@ -633,12 +641,12 @@ void StartProgram(int argNumb, char **arguments)
 						break;
 					}
 				}
-			
+
 			args = arguments[3];
 
 			if(args[0] < '1' || args[0] > '9')
 				range = false;
-			
+
 			if(range)
 				for(int i = 1; i < args.length(); i++)
 				{
@@ -648,12 +656,12 @@ void StartProgram(int argNumb, char **arguments)
 						break;
 					}
 				}
-			
+
 			if(range)
 			{
-				
+
 				int n1 =atoi(arguments[2]), n2 = atoi(arguments[3]);
-					
+
 				if(range && n2 < n1)
 				{
 					range = false;
@@ -666,7 +674,7 @@ void StartProgram(int argNumb, char **arguments)
 				return ;
 			}
 		}
-		
+
 		cout << "Wrong arguments!" << endl;
 	}
 }

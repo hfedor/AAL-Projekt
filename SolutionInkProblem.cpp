@@ -49,10 +49,10 @@ std::list<int> SolutionInkProblem::BrutalPermutation(string sShelf, char notSort
 {
 	if(too_slow)
 		return list<int>{-2};
-	
+
 	if(sShelf.length() <= 6)
 		return list<int>{-1};
-	
+
     list<int> transforamtions;
     if(deep == 0)
     {
@@ -77,8 +77,12 @@ std::list<int> SolutionInkProblem::BrutalPermutation(string sShelf, char notSort
         nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
         nElapsed.QuadPart /= nFrequency.QuadPart;
 
-       if((nElapsed).QuadPart > 500)
-		   return list<int>{-2};
+       if((nElapsed).QuadPart > 5000)
+		{
+			cout << (nElapsed).QuadPart << endl;
+			too_slow = true;
+			throw to_string((nElapsed).QuadPart);
+		}
 #else
         steady_clock::time_point t2 = steady_clock::now();
         duration = t2-start_time;
@@ -90,7 +94,7 @@ std::list<int> SolutionInkProblem::BrutalPermutation(string sShelf, char notSort
 			return list<int>{-2};
 		}
 #endif
-		
+
         for(int i = 0; i <  sShelf.length() - 4; i++)
         {
             Shelf permutedSfelf(sShelf);
@@ -114,10 +118,10 @@ std::list<int> SolutionInkProblem::BrutalPermutationSparing(char biggestInBegin,
 {
 	if(too_slow)
 		return list<int>{-2};
-	
+
 	if(sShelf.length() <= 6)
 		return list<int>{-1};
-	
+
     list<int> transforamtions;
     Shelf permutationShelf(sShelf);
     if(deep == 0)
@@ -146,7 +150,7 @@ std::list<int> SolutionInkProblem::BrutalPermutationSparing(char biggestInBegin,
                     for(int k = j+1; k < permutationShelf.length(); k++)
                         sShelf2 += permutationShelf.ToString()[k];
                     //cout << sShelf2 << endl;
-				
+
 					if(sShelf2.length() > 7)
                     if((do_last_6 && sShelf2.length() - j > 5) || j < ((int)sShelf2.length()) - 6)
                     {
@@ -195,7 +199,7 @@ std::list<int> SolutionInkProblem::BrutalPermutationSparing(char biggestInBegin,
         nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
         nElapsed.QuadPart /= nFrequency.QuadPart;
 
-       if((nElapsed).QuadPart > 500)
+       if((nElapsed).QuadPart > 5000)
 		   return list<int>{-2};
 #else
         steady_clock::time_point t2 = steady_clock::now();
@@ -267,7 +271,7 @@ std::list<int> SolutionInkProblem::BrutalPermutationLast6(string sShelf, int dee
 	if(too_slow)
 		return list<int>{-2};
     list<int> transforamtions;
-	
+
 	if(sShelf.length() <= 6)
 		return list<int>{-1};
 
@@ -397,7 +401,7 @@ int SolutionInkProblem::CountCost(int mode)
 		result = CountCostLast6Brutal();
 	else
 		result = 4012;
-	
+
 	if(length() > 6)
 	{
 		int tmp;
@@ -577,8 +581,12 @@ int SolutionInkProblem::MoveBottleToPos(int actPos, int bottleToBeMoved, bool an
         nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
         nElapsed.QuadPart /= nFrequency.QuadPart;
 
-       if((nElapsed).QuadPart > 500)
-		   return list<int>{-2};
+       if((nElapsed).QuadPart > 5000)
+        {
+			cout << (duration).QuadPart << endl;
+			too_slow = true;
+			throw to_string((duration).QuadPart);
+		}
 #else
         steady_clock::time_point t2 = steady_clock::now();
         duration = t2-start_time;
@@ -1017,7 +1025,7 @@ int SolutionInkProblem::Solve(int mode, bool animated)
             else
                 switch(mode)
                     {
-                    case 1 :	
+                    case 1 :
                         if(!SolveBrtualBegining(i,notSorted,animated))
 							;//return false;
                         break;
@@ -1245,7 +1253,7 @@ int SolutionInkProblem::SolveBrtualBegining(int j, char notSorted, bool animated
 		return -2;
     string ShelfEnding = "";
     string sShelf = ToString();
-	
+
 	if(length() - j <= 6)
 		return 0;
 
@@ -1256,7 +1264,7 @@ int SolutionInkProblem::SolveBrtualBegining(int j, char notSorted, bool animated
     transforamtions.push_back(-1);
     for(int deep = 0;transforamtions.front() == -1; deep++)
         transforamtions = BrutalPermutation(ShelfEnding,notSorted,deep);
-	
+
     if(transforamtions.front() != -1)
     {
         for(list<int>::iterator l = transforamtions.begin(); l != transforamtions.end(); l++)
@@ -1276,7 +1284,7 @@ int SolutionInkProblem::SolveBrtualBeginingSparing(char biggestInBegin, int j, c
 
 	if(length() - j <= 6)
 		return 0;
-	
+
     for(int l = j; l < length(); l++)
         ShelfEnding += sShelf[l];
 
@@ -1354,7 +1362,7 @@ int SolutionInkProblem::SolveLast6List(bool animated)
 {
     string ShelfEnding = "";
     string sShelf = ToString();
-	
+
     for(int i = length() - 6; i < length(); i++)
         ShelfEnding += sShelf[i];
 
@@ -1396,8 +1404,12 @@ int SolutionInkProblem::SolveMod4(int actPos, int bottleToBeMoved, char biggestI
         nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
         nElapsed.QuadPart /= nFrequency.QuadPart;
 
-       if((nElapsed).QuadPart > 500)
-		   return list<int>{-2};
+       if((nElapsed).QuadPart > 5000)
+		{
+			cout << "Too long: " << (nElapsed).QuadPart << endl;
+			too_slow = true;
+			throw to_string((nElapsed).QuadPart);
+		}
 #else
         steady_clock::time_point t2 = steady_clock::now();
         duration = t2-start_time;
